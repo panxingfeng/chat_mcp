@@ -2,6 +2,17 @@
 
 chat_mcp是一个聊天服务和工具执行平台，允许用户通过聊天界面与AI助手交互并执行各种工具。该平台采用模块化设计，支持多种LLM模型和各种MCP工具服务集成。
 
+## 支持模型
+ - Ollama
+ - DeepSeek
+ - Openai
+ - 硅基流动
+ - LM Studio 
+ - Gemini
+
+ps:目前不支持推理模型
+
+
 ## 功能演示
 
 | ![工具交互测试](./images/MCP工具交互测试.gif) | ![MCP工具测试](/images/MCP工具测试.gif) | ![MCP工具测试](/images/单工具多模型测试1.png) | ![MCP工具测试](/images/单工具多模型测试2.png) |
