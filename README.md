@@ -86,6 +86,7 @@ python main.py
     }
   }
 }
+wechat不支持linux环境
 ```
 
 ## 功能演示
