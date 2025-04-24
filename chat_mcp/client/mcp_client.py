@@ -88,9 +88,6 @@ class MCPClient:
         self.base_url = base_url if base_url is not None else self.base_url
         self.model = model if model is not None else self.model
 
-        logger.info(
-            f"使用参数 - model: {self.model}, api_key: {'已设置' if self.api_key else '未设置'}, base_url: {self.base_url}")
-
         if not self.api_key:
             error_msg = "错误: API密钥未设置"
             logger.error(error_msg)
@@ -111,7 +108,6 @@ class MCPClient:
 
         try:
             self.llm_client = OpenAI(api_key=self.api_key, base_url=self.base_url)
-            logger.info(f"已创建LLM客户端，base_url: {self.base_url}")
 
             self.conversation_executor = ConversationExecutor(
                 llm_client=self.llm_client,

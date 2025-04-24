@@ -851,16 +851,36 @@ function Message({ message, isStreaming = false, isNew = false,onSendMessage, on
 
   const handleCopyMessage = (e) => {
     e.stopPropagation();
-
+  
     let textToCopy = content;
-
+  
+    if (!isUser && typeof processedContent === 'string' && /\[执行工具:|/.test(processedContent)) {
+      const finalResponsePattern = /(?:最终回答|最终结果|生成回答)[:：]?\s*([\s\S]+)$/;
+      const finalResponseMatch = processedContent.match(finalResponsePattern);
+      
+      if (finalResponseMatch) {
+        textToCopy = finalResponseMatch[1].trim();
+        navigator.clipboard.writeText(textToCopy)
+          .then(() => {
+            setShowCopyTooltip(true);
+            setTimeout(() => {
+              setShowCopyTooltip(false);
+            }, 2000);
+          })
+          .catch(err => {
+            console.error('复制失败:', err);
+          });
+        return;
+      }
+    }
+  
     if (structuredContent) {
       const textItems = structuredContent.filter(item => item.type === 'text');
       if (textItems.length > 0) {
         textToCopy = textItems.map(item => item.content).join('\n\n');
       }
     }
-
+  
     navigator.clipboard.writeText(textToCopy)
       .then(() => {
         setShowCopyTooltip(true);

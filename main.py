@@ -214,7 +214,7 @@ async def chat_stream(request: Request):
                     await mcp_client.initialize()
                     logging.info("已初始化MCP客户端")
 
-                logging.info(f"开始处理查询 - model: {model}, base_url: {base_url}, LLM服务商: {provider}")
+                logging.info(f"开始处理查询:{message} - model: {model}, base_url: {base_url}, LLM服务商: {provider}")
                 async for chunk in mcp_client.process_query_stream(
                         user_query=message,
                         system_prompt=system_prompt,
