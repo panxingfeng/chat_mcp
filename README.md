@@ -66,7 +66,7 @@ python main.py
   "mcpServers": {
     "weather": {
       "command": "python",
-      "args": ["-m", "chat_mcp.mcp_server.mcp_server_weather", "--api-key=YOUR_API_KEY"]
+      "args": ["-m", "chat_mcp.mcp_server.mcp_server_weather", "--api-key=GAODE_API_KEY"]
     },
     "speech": {
       "command": "python",
