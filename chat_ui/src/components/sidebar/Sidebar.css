@@ -1,4 +1,3 @@
-/* 侧边栏基本样式 */
 .sidebar {
   width: 260px;
   height: 100vh;
@@ -14,7 +13,6 @@
   overflow-y: auto;
 }
 
-/* 侧边栏头部 */
 .sidebar-header {
   padding: 16px;
   display: flex;
@@ -39,7 +37,6 @@
   color: var(--text-primary, #333);
 }
 
-/* 会话列表 */
 .conversations-list {
   flex: 1;
   overflow-y: auto;
@@ -53,6 +50,8 @@
   border-radius: 12px;
   padding: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 1;
 }
 
 .group-header {
@@ -65,7 +64,6 @@
   padding-bottom: 6px;
 }
 
-/* 会话项样式 */
 .conversation-item {
   display: flex;
   justify-content: space-between;
@@ -76,6 +74,8 @@
   cursor: pointer;
   transition: all 0.2s;
   background-color: var(--bg-tertiary, rgba(255, 255, 255, 0.5));
+  position: relative;
+  z-index: 1;
 }
 
 .conversation-item:hover {
@@ -87,13 +87,19 @@
 .conversation-item.active {
   background-color: var(--primary-light, #e3f2fd);
   box-shadow: 0 2px 4px rgba(33, 150, 243, 0.1);
+  z-index: 2;
+}
+
+.conversation-item.menu-open {
+  z-index: 20 !important;
 }
 
 .conversation-content {
   display: flex;
-  align-items: center;
-  flex: 1;
+  align-items: flex-start;
+  width: calc(100% - 30px);
   overflow: hidden;
+  padding-right: 8px;
 }
 
 .conversation-icon {
@@ -107,6 +113,14 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  flex-shrink: 0;
+}
+
+.conversation-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
 }
 
 .conversation-title {
@@ -117,18 +131,109 @@
   color: var(--text-primary, #333);
 }
 
-/* 操作按钮 */
+.conversation-time {
+  font-size: 10px;
+  color: #888;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .conversation-actions {
-  display: none;
+  display: flex;
   align-items: center;
-  background-color: var(--bg-primary, rgba(255, 255, 255, 0.9));
-  border-radius: 20px;
-  padding: 2px 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+  min-width: 28px;
+  z-index: 30;
 }
 
 .conversation-item:hover .conversation-actions {
+  opacity: 1;
+}
+
+.menu-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s, transform 0.2s;
+  color: var(--text-secondary, #666);
+  position: relative;
+  z-index: 31;
+}
+
+.menu-toggle-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+  color: var(--text-primary, #333);
+}
+
+.menu-toggle-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.actions-dropdown {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  z-index: 40;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-50%) scale(0.9); }
+  to { opacity: 1; transform: translateY(-50%) scale(1); }
+}
+
+.actions-dropdown .action-btn {
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+  width: 36px;
+  height: 36px;
+}
+
+.actions-dropdown .action-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.actions-dropdown .action-btn:active {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.actions-dropdown .action-btn.star-btn {
+  color: #f9a825;
+}
+
+.actions-dropdown .action-btn.rename-btn {
+  color: var(--primary-color, #2196f3);
+}
+
+.actions-dropdown .action-btn.delete-btn {
+  color: var(--error-color, #f44336);
 }
 
 .action-btn {
@@ -136,70 +241,61 @@
   border: none;
   cursor: pointer;
   font-size: 14px;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 1px;
-  border-radius: 50%;
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
-  transform: scale(1.1);
 }
 
 .star-btn.active {
   color: #f9a825;
 }
 
-.rename-btn:hover {
-  color: var(--primary-color, #2196f3);
-  background-color: var(--primary-light, rgba(33, 150, 243, 0.1));
+.conversation-edit .save-btn {
+  background: var(--primary-color, #2196f3) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 8px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  padding: 0 !important;
+  margin-left: 4px;
+  flex-shrink: 0;
+  line-height: 0 !important;
+  transform: translateY(0) !important;
 }
 
-.delete-btn:hover {
-  color: var(--error-color, #f44336);
-  background-color: rgba(244, 67, 54, 0.1);
+.conversation-edit .save-btn:hover {
+  background-color: var(--primary-hover, #1976d2) !important;
+  transform: scale(1.05) !important;
 }
 
-/* 编辑模式 */
-.conversation-edit {
-  display: flex;
+.sidebar .conversation-edit {
+  display: flex !important;
   width: 100%;
-  align-items: center;
+  align-items: center !important;
+  height: 28px !important;
 }
 
-.conversation-edit input {
+.sidebar .conversation-edit input {
   flex: 1;
-  padding: 6px 10px;
-  border: 1px solid var(--border-color, #ddd);
-  border-radius: 20px;
-  margin-right: 6px;
-  font-size: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) inset;
+  padding: 2px 8px !important;
+  border: 1px solid var(--border-color, #ddd) !important;
+  border-radius: 12px !important;
+  margin-right: 4px;
+  font-size: 12px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) inset;
   background-color: var(--bg-input, #fff);
   color: var(--text-primary, #333);
+  height: 22px !important;
+  min-height: 0 !important;
+  line-height: 22px !important;
 }
 
-.save-btn {
-  background: var(--primary-color, #2196f3);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-/* 新建聊天按钮 */
 .new-chat-button {
   margin: 12px;
   padding: 10px;
@@ -228,7 +324,6 @@
   font-size: 18px;
 }
 
-/* 侧边栏底部 */
 .sidebar-footer {
   padding: 12px;
   border-top: 1px solid var(--border-color, rgba(224, 224, 224, 0.4));
@@ -281,7 +376,6 @@
   height: 24px;
 }
 
-/* 侧边栏切换按钮 */
 .sidebar-toggle-btn {
   background: none;
   border: none;
@@ -302,13 +396,11 @@
   color: var(--text-primary, #333);
 }
 
-/* 侧边栏隐藏状态 */
 .sidebar.hidden {
   transform: translateX(-100%);
   visibility: hidden;
 }
 
-/* Header中的侧边栏切换按钮 */
 .header .sidebar-toggle {
   margin-right: 10px;
 }
@@ -332,7 +424,6 @@
   color: var(--primary-color, #1976d2);
 }
 
-/* 添加遮罩层 */
 .sidebar-backdrop {
   position: fixed;
   top: 0;
@@ -348,7 +439,20 @@
   display: block;
 }
 
-/* 响应式设计调整 */
+.message-text {
+  position: relative;
+  padding-right: 36px;
+}
+
+.message .action-buttons {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 4px;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     width: 260px;
@@ -362,82 +466,8 @@
   .chat-app:not(.sidebar-hidden) .sidebar {
     transform: translateX(0);
   }
+  
+  .message-text {
+    padding-right: 40px;
+  }
 }
-
-
-
-.conversation-info {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex: 1;
-}
-
-.conversation-title {
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.conversation-time {
-  font-size: 10px;
-  color: #888;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-
-
-/* 在Sidebar.css中添加以下样式 */
-.conversation-info {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex: 1;
-}
-
-.conversation-title {
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.conversation-time {
-  font-size: 10px;
-  color: #888;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 确保会话项目内容能够正确排列 */
-.conversation-content {
-  display: flex;
-  align-items: flex-start;
-  width: 100%;
-  overflow: hidden;
-  padding-right: 8px;
-}
-
-.conversation-icon {
-  margin-right: 8px;
-  flex-shrink: 0;
-}
-
-/* 调整操作按钮样式确保兼容性 */
-.conversation-actions {
-  display: flex;
-  flex-shrink: 0;
-  opacity: 0.3;
-  transition: opacity 0.2s ease;
-}
-
-.conversation-item:hover .conversation-actions {
-  opacity: 1;
-}
-

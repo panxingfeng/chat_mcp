@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Sidebar.css';
 
 function Sidebar({
@@ -16,6 +16,7 @@ function Sidebar({
 }) {
   const [editingId, setEditingId] = useState(null);
   const [editingTitle, setEditingTitle] = useState('');
+  const [menuVisibleForId, setMenuVisibleForId] = useState(null);
 
   const getConversationIcon = (title) => {
     if (title.includes('Translator')) return '🌐';
@@ -61,6 +62,7 @@ function Sidebar({
     e.stopPropagation();
     setEditingId(conversation.id);
     setEditingTitle(conversation.title);
+    setMenuVisibleForId(null);
   };
 
   const handleRenameSubmit = (conversationId, e) => {
@@ -76,11 +78,34 @@ function Sidebar({
     if (window.confirm('确定要删除这个会话吗？此操作不可撤销。')) {
       onDeleteConversation(conversationId);
     }
+    setMenuVisibleForId(null);
   };
 
   const handleToggleStar = (conversationId, isStarred, e) => {
     e.stopPropagation();
     onToggleStarred(conversationId, !isStarred);
+    setMenuVisibleForId(null);
+  };
+
+  const toggleMenu = (conversationId, e) => {
+    e.stopPropagation();
+    
+    document.querySelectorAll('.conversation-item').forEach(item => {
+      item.classList.remove('menu-open');
+    });
+    
+    if (menuVisibleForId === conversationId) {
+      setMenuVisibleForId(null);
+    } else {
+      setMenuVisibleForId(conversationId);
+      
+      setTimeout(() => {
+        const currentItem = document.querySelector(`.conversation-item[data-id="${conversationId}"]`);
+        if (currentItem) {
+          currentItem.classList.add('menu-open');
+        }
+      }, 0);
+    }
   };
 
   const openPartnerSettings = () => {
@@ -90,6 +115,16 @@ function Sidebar({
   const handleConversationClick = (id) => {
     onSelectConversation(id);
     onToggleVisibility();
+    setMenuVisibleForId(null);
+  };
+
+  const handleOutsideClick = () => {
+    if (menuVisibleForId !== null) {
+      document.querySelectorAll('.conversation-item').forEach(item => {
+        item.classList.remove('menu-open');
+      });
+      setMenuVisibleForId(null);
+    }
   };
 
   const sortedStarredConversations = conversations
@@ -110,6 +145,93 @@ function Sidebar({
       const bTime = b.messages && b.messages.length > 0 ? new Date(b.messages[b.messages.length - 1].timestamp) : new Date(0);
       return bTime - aTime;
     });
+
+  useEffect(() => {
+    document.addEventListener('click', handleOutsideClick);
+    return () => {
+      document.removeEventListener('click', handleOutsideClick);
+    };
+  }, []);
+
+  const renderConversationItem = (conversation) => {
+    return (
+      <div
+        key={conversation.id}
+        data-id={conversation.id}
+        className={`conversation-item ${conversation.id === currentConversation ? 'active' : ''}`}
+        onClick={() => handleConversationClick(conversation.id)}
+      >
+        {editingId === conversation.id ? (
+          <form onSubmit={(e) => handleRenameSubmit(conversation.id, e)} className="conversation-edit">
+            <input
+              type="text"
+              value={editingTitle}
+              onChange={(e) => setEditingTitle(e.target.value)}
+              autoFocus
+              onBlur={() => setEditingId(null)}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button type="submit" className="save-btn">✓</button>
+          </form>
+        ) : (
+          <>
+            <div className="conversation-content">
+              <span className="conversation-icon">
+                {getConversationIcon(conversation.title)}
+              </span>
+              <div className="conversation-info">
+                <span className="conversation-title">{conversation.title}</span>
+                {getLastMessageTime(conversation) && (
+                  <span className="conversation-time">
+                    {conversation.starred ? '最后消息时间: ' : ''}{getLastMessageTime(conversation)}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="conversation-actions">
+              <button
+                className="action-btn menu-toggle-btn"
+                onClick={(e) => toggleMenu(conversation.id, e)}
+                title="操作菜单"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="6" r="1.5"></circle>
+                  <circle cx="12" cy="12" r="1.5"></circle>
+                  <circle cx="12" cy="18" r="1.5"></circle>
+                </svg>
+              </button>
+              
+              {menuVisibleForId === conversation.id && (
+                <div className="actions-dropdown" onClick={(e) => e.stopPropagation()}>
+                  <button
+                    className={`action-btn star-btn ${conversation.starred ? 'active' : ''}`}
+                    onClick={(e) => handleToggleStar(conversation.id, conversation.starred, e)}
+                    title={conversation.starred ? "取消星标" : "设为星标"}
+                  >
+                    {conversation.starred ? '⭐' : '☆'}
+                  </button>
+                  <button
+                    className="action-btn rename-btn"
+                    onClick={(e) => handleRenameStart(conversation, e)}
+                    title="重命名"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    className="action-btn delete-btn"
+                    onClick={(e) => handleDelete(conversation.id, e)}
+                    title="删除会话"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className={`sidebar ${!isVisible ? 'hidden' : ''}`}>
@@ -132,131 +254,13 @@ function Sidebar({
         {sortedStarredConversations.length > 0 && (
           <div className="conversation-group">
             <div className="group-header">⭐ 星标会话</div>
-            {sortedStarredConversations.map((conversation) => (
-              <div
-                key={conversation.id}
-                className={`conversation-item ${conversation.id === currentConversation ? 'active' : ''}`}
-                onClick={() => handleConversationClick(conversation.id)}
-              >
-                {editingId === conversation.id ? (
-                  <form onSubmit={(e) => handleRenameSubmit(conversation.id, e)} className="conversation-edit">
-                    <input
-                      type="text"
-                      value={editingTitle}
-                      onChange={(e) => setEditingTitle(e.target.value)}
-                      autoFocus
-                      onBlur={() => setEditingId(null)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                    <button type="submit" className="save-btn">✓</button>
-                  </form>
-                ) : (
-                  <>
-                    <div className="conversation-content">
-                      <span className="conversation-icon">
-                        {getConversationIcon(conversation.title)}
-                      </span>
-                      <div className="conversation-info">
-                        <span className="conversation-title">{conversation.title}</span>
-                        {getLastMessageTime(conversation) && (
-                          <span className="conversation-time">
-                            最后消息时间: {getLastMessageTime(conversation)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="conversation-actions">
-                      <button
-                        className="action-btn star-btn active"
-                        onClick={(e) => handleToggleStar(conversation.id, conversation.starred, e)}
-                        title="取消星标"
-                      >
-                        ⭐
-                      </button>
-                      <button
-                        className="action-btn rename-btn"
-                        onClick={(e) => handleRenameStart(conversation, e)}
-                        title="重命名"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        className="action-btn delete-btn"
-                        onClick={(e) => handleDelete(conversation.id, e)}
-                        title="删除会话"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
+            {sortedStarredConversations.map(renderConversationItem)}
           </div>
         )}
 
         <div className="conversation-group">
           {sortedStarredConversations.length > 0 && <div className="group-header">所有会话</div>}
-          {sortedUnstarredConversations.map((conversation) => (
-            <div
-              key={conversation.id}
-              className={`conversation-item ${conversation.id === currentConversation ? 'active' : ''}`}
-              onClick={() => handleConversationClick(conversation.id)}
-            >
-              {editingId === conversation.id ? (
-                <form onSubmit={(e) => handleRenameSubmit(conversation.id, e)} className="conversation-edit">
-                  <input
-                    type="text"
-                    value={editingTitle}
-                    onChange={(e) => setEditingTitle(e.target.value)}
-                    autoFocus
-                    onBlur={() => setEditingId(null)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                  <button type="submit" className="save-btn">✓</button>
-                </form>
-              ) : (
-                <>
-                  <div className="conversation-content">
-                    <span className="conversation-icon">
-                      {getConversationIcon(conversation.title)}
-                    </span>
-                    <div className="conversation-info">
-                      <span className="conversation-title">{conversation.title}</span>
-                      {getLastMessageTime(conversation) && (
-                        <span className="conversation-time">
-                          最后消息时间: {getLastMessageTime(conversation)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="conversation-actions">
-                    <button
-                      className="action-btn star-btn"
-                      onClick={(e) => handleToggleStar(conversation.id, conversation.starred, e)}
-                      title="设为星标"
-                    >
-                      ☆
-                    </button>
-                    <button
-                      className="action-btn rename-btn"
-                      onClick={(e) => handleRenameStart(conversation, e)}
-                      title="重命名"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className="action-btn delete-btn"
-                      onClick={(e) => handleDelete(conversation.id, e)}
-                      title="删除会话"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
+          {sortedUnstarredConversations.map(renderConversationItem)}
         </div>
       </div>
 

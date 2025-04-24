@@ -46,7 +46,7 @@ npm start
 python -m venv venv
 
 # 激活虚拟环境
-venv\Scripts\activate  # win
+.venv\Scripts\activate  # win
 source venv/bin/activate #linux/mac
   
 
@@ -99,7 +99,7 @@ python main.py
 
 ## 功能演示
 
-| ![工具交互测试](./images/MCP工具交互测试.gif) | ![MCP工具测试](./images/MCP工具测试.gif) | ![单工具多模型测试1](./images/单工具多模型测试1.png) | ![单工具多模型测试2](./images/单工具多模型测试2.png) |
+| ![工具交互测试](./images/MCP工具交互测试.gif) | ![MCP工具测试](./images/MCP工具测试.gif) | ![单工具测试](./images/单工具测试.png) | ![双工具测试](./images/双工具测试.png) |
 |:---:|:---:|:---:|:---:|
 
 
