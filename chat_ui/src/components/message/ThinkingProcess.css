@@ -1,0 +1,227 @@
+/* 思考按钮容器 */
+.thinking-button-container {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  z-index: 10;
+}
+
+/* 思考切换按钮样式 */
+.thinking-toggle-button {
+  background-color: rgba(240, 240, 240, 0.85);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.4;
+}
+
+.thinking-toggle-button:hover {
+  background-color: rgba(232, 232, 232, 0.95);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.thinking-toggle-button:active {
+  background-color: #e0e0e0;
+  transform: translateY(1px);
+}
+
+/* 思考内容弹出区域 */
+.thinking-content-popup {
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin: 0 0 12px 0;
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* 思考内容样式 */
+.thinking-content {
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+  white-space: pre-wrap;
+}
+
+.thinking-content code {
+  background-color: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 90%;
+  color: #555;
+}
+
+.thinking-content pre {
+  background-color: #f5f5f5;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 8px 0;
+  border: 1px solid #eee;
+}
+
+/* 滚动条样式 */
+.thinking-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.thinking-content::-webkit-scrollbar-track {
+  background-color: #f2f2f2;
+}
+
+.thinking-content::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+.thinking-content::-webkit-scrollbar-thumb:hover {
+  background-color: #aaa;
+}
+
+/* 修正消息布局，为思考按钮留出空间 */
+.assistant-message .message-content {
+  position: relative;
+  padding-top: 36px;
+}
+
+/* 思考内容与消息主体的间距 */
+.thinking-content-popup + .message-text,
+.thinking-content-popup + .structured-content,
+.thinking-content-popup + .direct-image-container {
+  margin-top: 8px;
+}
+
+/* 思考内容中的Markdown样式 */
+.thinking-content h1,
+.thinking-content h2,
+.thinking-content h3,
+.thinking-content h4,
+.thinking-content h5,
+.thinking-content h6 {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+.thinking-content h1 {
+  font-size: 18px;
+}
+
+.thinking-content h2 {
+  font-size: 17px;
+}
+
+.thinking-content h3 {
+  font-size: 16px;
+}
+
+.thinking-content h4,
+.thinking-content h5,
+.thinking-content h6 {
+  font-size: 15px;
+}
+
+.thinking-content ul,
+.thinking-content ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.thinking-content li {
+  margin-bottom: 4px;
+}
+
+.thinking-content blockquote {
+  border-left: 3px solid #ddd;
+  padding-left: 12px;
+  margin: 8px 0;
+  color: #666;
+}
+
+.thinking-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+}
+
+.thinking-content th,
+.thinking-content td {
+  border: 1px solid #e0e0e0;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.thinking-content th {
+  background-color: #f5f5f5;
+  font-weight: 500;
+}
+
+.thinking-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.thinking-content a {
+  color: #1677ff;
+  text-decoration: none;
+}
+
+.thinking-content a:hover {
+  text-decoration: underline;
+}
+
+/* 适应移动设备的响应式样式 */
+@media (max-width: 768px) {
+  .thinking-button-container {
+    top: 4px;
+    left: 8px;
+  }
+
+  .thinking-toggle-button {
+    padding: 1px 6px;
+    font-size: 11px;
+  }
+
+  .thinking-content-popup {
+    max-height: 250px;
+  }
+
+  .assistant-message .message-content {
+    padding-top: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .thinking-button-container {
+    top: 3px;
+    left: 6px;
+  }
+
+  .thinking-toggle-button {
+    padding: 1px 4px;
+    font-size: 10px;
+  }
+
+  .thinking-content-popup {
+    max-height: 200px;
+  }
+
+  .thinking-content {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}

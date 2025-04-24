@@ -1,0 +1,1272 @@
+/* =========================================
+ * 基础消息样式
+ * ========================================= */
+.message {
+  padding: 0;
+  margin-bottom: 12px;
+  max-width: 70%;
+  display: flex;
+  position: relative;
+}
+
+/* 用户消息靠右显示 */
+.user-message {
+  align-self: flex-end;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* 助手消息靠左显示 */
+.assistant-message {
+  align-self: flex-start;
+  margin-right: auto;
+  margin-left: 0;
+}
+
+.message-content {
+  position: relative;
+  max-width: 100%;
+}
+
+/* 消息元数据样式 */
+.message-info {
+  display: flex;
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+  padding-left: 4px;
+}
+
+.message-metadata {
+  font-size: 12px;
+  color: #999;
+}
+
+.message-separator {
+  margin: 0 4px;
+  color: #999;
+}
+
+/* 针对图片消息添加特殊控制 */
+.message.with-image {
+  max-width: 50%;
+}
+
+/* =========================================
+ * 消息文本样式
+ * ========================================= */
+.message-text {
+  padding: 12px 16px;
+  border-radius: 8px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: left;
+  transition: height 0.2s ease;
+}
+
+.user-message .message-text {
+  background-color: #f2f2f2;
+  color: #000000;
+}
+
+.assistant-message .message-text {
+  background-color: #ffffff;
+  color: #262626;
+  border: 1px solid #f0f0f0;
+}
+
+/* =========================================
+ * Markdown 元素样式
+ * ========================================= */
+/* 代码块样式 */
+.message-text pre {
+  border-radius: 8px;
+  margin: 8px 0;
+  text-align: left;
+}
+
+.user-message .message-text pre {
+  background-color: #e0e0e0 !important;
+}
+
+/* 内联代码样式 */
+.message-text code:not(pre code) {
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.9em;
+  background-color: #f0f0f0;
+  color: #476582;
+}
+
+.user-message .message-text code:not(pre code) {
+  background-color: #e0e0e0;
+  color: #333333;
+}
+
+/* 表格样式 */
+.table-container {
+  overflow-x: auto;
+  margin: 12px 0;
+}
+
+.message-text table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9em;
+  margin-bottom: 12px;
+}
+
+.message-text th,
+.message-text td {
+  padding: 8px 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.message-text th {
+  font-weight: 600;
+}
+
+.assistant-message .message-text th {
+  background-color: #f0f0f0;
+}
+
+/* 链接样式 */
+.message-text a {
+  text-decoration: underline;
+}
+
+.assistant-message .message-text a {
+  color: #1677ff;
+}
+
+/* 列表样式 */
+.message-text ul,
+.message-text ol {
+  padding-left: 24px;
+  margin: 8px 0;
+  text-align: left;
+}
+
+/* 引用块样式 */
+.message-text blockquote {
+  border-left: 4px solid;
+  padding-left: 12px;
+  margin: 8px 0 8px 8px;
+  text-align: left;
+}
+
+.user-message .message-text blockquote {
+  border-left-color: #d9d9d9;
+}
+
+.assistant-message .message-text blockquote {
+  border-left-color: #d9d9d9;
+  background-color: #fafafa;
+  padding: 8px 12px;
+  border-radius: 0 4px 4px 0;
+}
+
+/* 图片样式 */
+.message-text img, .markdown-image {
+  border-radius: 8px;
+  margin: 8px 0;
+  max-width: 100%;
+  max-height: 180px;
+  height: auto;
+}
+
+/* =========================================
+ * 思考过程相关样式
+ * ========================================= */
+/* 消息气泡样式 */
+.message-bubble {
+  position: relative;
+  border-radius: 12px;
+  background-color: #fff; /* 助手消息背景 */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 100%;
+}
+
+
+/* 思考按钮容器 - 置于消息左上角 */
+.thinking-button-container {
+  position: absolute;
+  top: 6px;
+  left: 12px;
+  z-index: 10;
+}
+
+/* 思考切换按钮样式 */
+.thinking-toggle-button {
+  background-color: rgba(240, 240, 240, 0.85);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.4;
+}
+
+/* 消息内部内容布局 */
+.message-inner-content {
+  display: flex;
+  flex-direction: column;
+  padding: 36px 16px 16px 16px; /* 顶部增加padding为思考按钮留空间 */
+}
+
+.thinking-toggle-button:hover {
+  background-color: rgba(232, 232, 232, 0.95);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.thinking-toggle-button:active {
+  background-color: #e0e0e0;
+  transform: translateY(1px);
+}
+
+/* 思考内容弹出区域 */
+.thinking-content-popup {
+  background-color: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  margin: 8px 0 12px 0;
+  max-height: 300px;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* 思考内容样式 */
+.thinking-content {
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #555;
+  white-space: pre-wrap;
+}
+
+.thinking-content code {
+  background-color: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 90%;
+  color: #555;
+}
+
+.thinking-content pre {
+  background-color: #f5f5f5;
+  padding: 8px;
+  border-radius: 4px;
+  overflow-x: auto;
+  margin: 8px 0;
+  border: 1px solid #eee;
+}
+
+/* 滚动条样式 */
+.thinking-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.thinking-content::-webkit-scrollbar-track {
+  background-color: #f2f2f2;
+}
+
+.thinking-content::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+
+.thinking-content::-webkit-scrollbar-thumb:hover {
+  background-color: #aaa;
+}
+
+/* 修正消息布局，为思考按钮留出空间 */
+.assistant-message .message-content {
+  position: relative;
+  padding-top: 36px; /* 为顶部的思考按钮留出空间 */
+}
+
+/* 在思考过程打开时，增加内边距 */
+.assistant-message .message-content .thinking-content-popup + .message-text,
+.assistant-message .message-content .thinking-content-popup + .structured-content {
+  margin-top: 8px;
+}
+
+/* 思考内容中的Markdown样式增强 */
+.thinking-content h1,
+.thinking-content h2,
+.thinking-content h3,
+.thinking-content h4,
+.thinking-content h5,
+.thinking-content h6 {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+.thinking-content h1 {
+  font-size: 18px;
+}
+
+.thinking-content h2 {
+  font-size: 17px;
+}
+
+.thinking-content h3 {
+  font-size: 16px;
+}
+
+.thinking-content h4,
+.thinking-content h5,
+.thinking-content h6 {
+  font-size: 15px;
+}
+
+.thinking-content ul,
+.thinking-content ol {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.thinking-content li {
+  margin-bottom: 4px;
+}
+
+.thinking-content blockquote {
+  border-left: 3px solid #ddd;
+  padding-left: 12px;
+  margin: 8px 0;
+  color: #666;
+}
+
+.thinking-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0;
+}
+
+.thinking-content th,
+.thinking-content td {
+  border: 1px solid #e0e0e0;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.thinking-content th {
+  background-color: #f5f5f5;
+  font-weight: 500;
+}
+
+.thinking-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.thinking-content a {
+  color: #1677ff;
+  text-decoration: none;
+}
+
+.thinking-content a:hover {
+  text-decoration: underline;
+}
+
+/* =========================================
+ * 图片和图片编辑相关样式
+ * ========================================= */
+/* 直接URL图片容器 */
+.direct-image-container {
+  width: auto;
+  max-width: none;
+  margin: 8px 0;
+  padding: 0;
+  position: relative;
+  overflow: visible;
+}
+
+/* 确保嵌套在direct-image-container中的图片画廊组件宽度正确 */
+.direct-image-container .single-image-container,
+.direct-image-container .gallery-image-wrapper {
+  width: 250px;
+  margin: 0;
+}
+
+/* 确保图片预览模态框始终在最顶层 */
+.image-preview-modal {
+  z-index: 9999;
+}
+
+/* 确保direct-image-container中的所有交互元素可点击 */
+.direct-image-container,
+.direct-image-container * {
+  pointer-events: auto;
+}
+
+/* 调整direct-image-container为消息气泡风格 */
+.assistant-message .direct-image-container {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+}
+
+/* 确保direct-image-container中的模态框正确显示 */
+.direct-image-container .image-preview-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1100;
+}
+
+/* 编辑指令消息样式 */
+.edit-instruction-message {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  max-width: 250px;
+}
+
+.edit-target-image {
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.edit-instruction-header {
+  flex: 0 0 120px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e5e5e5;
+  padding: 15px;
+  background-color: #f9f9f9;
+}
+
+.edit-instruction-category {
+  font-weight: 500;
+  color: #3b82f6;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.edit-instruction-option {
+  color: #333;
+  font-size: 14px;
+}
+
+.edit-instruction-image {
+  flex: 1;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+}
+
+/* 当在用户消息中显示编辑指令时的样式调整 */
+.user-message .edit-instruction-message {
+  width: 100%;
+  max-width: 400px;
+  align-self: flex-end;
+  margin-left: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================
+ * 结构化内容相关样式
+ * ========================================= */
+/* 结构化内容容器 */
+.structured-content-container {
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* 结构化内容样式 */
+.structured-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+  padding: 12px 16px;
+  color: #262626;
+  border: 1px solid #f0f0f0;
+}
+
+.structured-text {
+  width: 100%;
+  font-size: 14px;
+  line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.structured-text p {
+  margin: 0 0 8px 0;
+}
+
+.structured-text p:last-child {
+  margin-bottom: 0;
+}
+
+.structured-image,
+.structured-images {
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 图片说明文字 */
+.image-caption {
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.03);
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* 确保结构化内容中的图片容器宽度合适 */
+.structured-image .single-image-container,
+.structured-images .image-gallery-container {
+  width: 100%;
+  margin: 0;
+  max-width: none;
+}
+
+/* =========================================
+ * 文件预览组件样式
+ * ========================================= */
+/* 结构化文件容器 */
+.structured-file {
+  width: 100%;
+  max-width: 450px;
+  margin: 8px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* 文件预览容器 */
+.file-preview-container {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #f8f8f8;
+  overflow: hidden;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.file-preview-container:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border-color: #d0d0d0;
+}
+
+/* 文件预览头部 */
+.file-preview-header {
+  padding: 10px 12px;
+  background-color: #f0f0f0;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.file-icon {
+  font-size: 18px;
+  margin-right: 10px;
+  color: #1677ff;
+}
+
+.file-name {
+  flex: 1;
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 文件预览内容 */
+.file-preview-content {
+  padding: 12px;
+  background-color: #ffffff;
+  max-height: 120px;
+  overflow: hidden;
+}
+
+.file-preview-text {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+  color: #333;
+  white-space: pre-wrap;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* 文件模态框 */
+.file-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  padding: 20px;
+}
+
+.file-modal-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.file-modal-header {
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+}
+
+.file-modal-header .file-icon {
+  color: #1677ff;
+}
+
+.file-modal-header .file-name {
+  flex: 1;
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #666;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+.file-modal-content {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+  background-color: #fff;
+}
+
+.file-content-full {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+  color: #333;
+}
+
+/* 加载中状态 */
+.file-preview-container.loading .file-preview-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+}
+
+.loading-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #1677ff;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 错误状态 */
+.file-preview-container.error {
+  background-color: #fff8f8;
+  border-color: #ffcdd2;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 14px;
+}
+
+/* 特殊文件类型图标颜色 */
+.file-icon.txt, .file-icon.md {
+  color: #1677ff; /* 蓝色 - 文本文件 */
+}
+
+.file-icon.pdf {
+  color: #e53935; /* 红色 - PDF文件 */
+}
+
+.file-icon.doc, .file-icon.docx {
+  color: #1565c0; /* 深蓝色 - Word文件 */
+}
+
+.file-icon.xls, .file-icon.xlsx, .file-icon.csv {
+  color: #2e7d32; /* 绿色 - Excel文件 */
+}
+
+.file-icon.ppt, .file-icon.pptx {
+  color: #e64a19; /* 橙色 - PowerPoint文件 */
+}
+
+.file-icon.json, .file-icon.xml {
+  color: #8e24aa; /* 紫色 - 数据文件 */
+}
+
+/* 用户消息中的文件样式 */
+.user-message .structured-file {
+  max-width: 400px;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.user-message .file-preview-container {
+  background-color: #f5f5f5;
+  border-color: #e0e0e0;
+}
+
+.user-message .file-preview-header {
+  background-color: #eaeaea;
+  border-bottom-color: #d9d9d9;
+}
+
+.user-message .file-preview-content {
+  background-color: #f5f5f5;
+}
+
+.user-message .file-preview-text {
+  color: #262626;
+}
+
+/* 如果用户直接使用了Markdown格式的文件引用 */
+.user-message .markdown-content .file-preview-container {
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* =========================================
+ * 消息控制按钮样式
+ * ========================================= */
+/* 消息控制按钮容器 */
+.message-controls {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 4px;
+  padding: 2px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 当鼠标悬停在消息上时显示控制按钮 */
+.message:hover .message-controls {
+  opacity: 1;
+}
+
+/* 控制按钮样式 */
+.control-button {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background-color: transparent;
+  color: #666;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.control-button:hover {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+/* 删除按钮样式 */
+.delete-button:hover {
+  color: #e53935; /* 红色 */
+}
+
+/* 复制按钮样式 */
+.copy-button:hover {
+  color: #1677ff; /* 蓝色 */
+}
+
+/* 用户消息的控制按钮样式调整 */
+.user-message .message-controls {
+  background-color: rgba(242, 242, 242, 0.9);
+}
+
+/* 助手消息的控制按钮样式调整 */
+.assistant-message .message-controls {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* 添加复制成功的提示样式 */
+.copy-tooltip {
+  position: absolute;
+  right: 40px;
+  top: 5px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: all 0.3s ease;
+}
+
+.copy-tooltip.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================================
+ * 动画效果
+ * ========================================= */
+/* 流式消息的光标闪烁效果 */
+.cursor-blink {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background-color: #000;
+  margin-left: 2px;
+  vertical-align: middle;
+  animation: cursor-blink 1s step-end infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 删除确认对话框样式 */
+.delete-confirm-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.delete-confirm-dialog {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  width: 85%;
+  max-width: 320px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.delete-confirm-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.cancel-button {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.confirm-button {
+  padding: 8px 16px;
+  background-color: #e53935;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* =========================================
+ * 响应式布局
+ * ========================================= */
+@media (max-width: 768px) {
+  /* 基础消息样式调整 */
+  .message {
+    max-width: 80%;
+  }
+
+  .message.with-image {
+    max-width: 65%;
+  }
+
+  /* 思考过程响应式调整 */
+  .thinking-button-container {
+    top: 4px;
+    left: 8px;
+  }
+
+  .thinking-toggle-button {
+    padding: 1px 6px;
+    font-size: 11px;
+  }
+
+  .thinking-content-popup {
+    max-height: 250px;
+  }
+
+  .assistant-message .message-content {
+    padding-top: 30px;
+  }
+
+  /* 图片容器响应式调整 */
+  .direct-image-container .single-image-container,
+  .direct-image-container .gallery-image-wrapper {
+    width: 200px;
+  }
+
+  /* 编辑指令响应式调整 */
+  .edit-instruction-message {
+    flex-direction: column;
+    max-width: 200px;
+  }
+
+  .edit-instruction-header {
+    flex: auto;
+    border-right: none;
+    border-bottom: 1px solid #e5e5e5;
+    width: 100%;
+  }
+
+  .edit-instruction-image {
+    padding: 10px;
+  }
+
+  .edit-target-image {
+    max-height: 180px;
+  }
+
+  /* 结构化内容响应式调整 */
+  .structured-content {
+    padding: 10px 14px;
+  }
+
+  /* 文件预览响应式调整 */
+  .structured-file {
+    max-width: 380px;
+  }
+
+  .file-modal-container {
+    width: 95%;
+  }
+
+  .file-modal-header {
+    padding: 10px 12px;
+  }
+
+  .file-modal-content {
+    padding: 12px;
+  }
+
+  .file-content-full {
+    font-size: 13px;
+  }
+
+  /* 用户消息文件响应式调整 */
+  .user-message .structured-file {
+    max-width: 350px;
+  }
+
+  .user-message .markdown-content .file-preview-container {
+    max-width: 350px;
+  }
+
+  /* 控制按钮响应式调整 */
+  .message-controls {
+    padding: 3px;
+  }
+
+  .control-button {
+    width: 30px;
+    height: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* 基础消息样式调整 */
+  .message {
+    max-width: 90%;
+  }
+
+  .message.with-image {
+    max-width: 80%;
+  }
+
+  /* 图片相关响应式调整 */
+  .message-text img, .markdown-image {
+    max-height: 160px;
+  }
+
+  .direct-image-container .single-image-container,
+  .direct-image-container .gallery-image-wrapper {
+    width: 170px;
+  }
+
+  /* 编辑指令响应式调整 */
+  .edit-instruction-message {
+    max-width: 170px;
+  }
+
+  .edit-target-image {
+    max-height: 160px;
+  }
+
+  /* 结构化内容响应式调整 */
+  .structured-content {
+    padding: 8px 12px;
+  }
+
+  .structured-text {
+    font-size: 13px;
+  }
+
+  /* 文件预览响应式调整 */
+  .structured-file {
+    max-width: 320px;
+  }
+
+  .file-preview-header {
+    padding: 8px 10px;
+  }
+
+  .file-preview-content {
+    padding: 10px;
+  }
+
+  .file-modal-container {
+    width: 98%;
+  }
+
+  .file-modal-header {
+    padding: 8px 10px;
+  }
+
+  .file-modal-content {
+    padding: 10px;
+  }
+
+  /* 用户消息文件响应式调整 */
+  .user-message .structured-file {
+    max-width: 280px;
+  }
+
+  .user-message .markdown-content .file-preview-container {
+    max-width: 280px;
+  }
+
+  /* 控制按钮响应式调整 */
+  .control-button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .message-controls {
+    opacity: 1; /* 在移动设备上始终显示控制按钮，便于触摸 */
+    top: 3px;
+    right: 3px;
+  }
+
+  /* 用户消息编辑指令响应式调整 */
+  .user-message .edit-instruction-message {
+    max-width: 300px;
+  }
+}
+
+
+/* 消息文本样式 */
+.message-text {
+  padding: 12px 16px;
+  border-radius: 8px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: left;
+  transition: height 0.2s ease;
+}
+
+.user-message .message-text {
+  background-color: var(--user-message-bg, #f2f2f2);
+  color: var(--text-primary, #000000);
+}
+
+.assistant-message .message-text {
+  background-color: var(--assistant-message-bg, #ffffff);
+  color: var(--text-primary, #262626);
+  border: 1px solid var(--assistant-message-border, #f0f0f0);
+}
+
+/* 消息气泡样式 */
+.message-bubble {
+  position: relative;
+  border-radius: 12px;
+  background-color: var(--assistant-message-bg, #fff);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 100%;
+}
+
+/* 思考切换按钮样式 */
+.thinking-toggle-button {
+  background-color: var(--bg-secondary, rgba(240, 240, 240, 0.85));
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: var(--text-secondary, #555);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.4;
+}
+
+/* 思考内容弹出区域 */
+.thinking-content-popup {
+  background-color: var(--bg-secondary, #f9f9f9);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 6px;
+  margin: 8px 0 12px 0;
+  max-height: 300px;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* 思考内容样式 */
+.thinking-content {
+  padding: 12px 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary, #555);
+  white-space: pre-wrap;
+}
+
+/* 消息元数据样式 */
+.message-info {
+  display: flex;
+  font-size: 12px;
+  color: var(--text-tertiary, #999);
+  margin-top: 2px;
+  padding-left: 4px;
+}
+
+.message-metadata {
+  font-size: 12px;
+  color: var(--text-tertiary, #999);
+}
+
+.message-separator {
+  margin: 0 4px;
+  color: var(--text-tertiary, #999);
+}
+
+/* 调整direct-image-container为消息气泡风格 */
+.assistant-message .direct-image-container {
+  background-color: var(--assistant-message-bg, #ffffff);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--assistant-message-border, #f0f0f0);
+}
+
+/* 编辑指令消息样式 */
+.edit-instruction-message {
+  border: 1px solid var(--border-color, #e5e5e5);
+  background-color: var(--bg-primary, #ffffff);
+}
+
+/* 结构化内容样式 */
+.structured-content {
+  background-color: var(--assistant-message-bg, #ffffff);
+  color: var(--text-primary, #262626);
+  border: 1px solid var(--assistant-message-border, #f0f0f0);
+}
+

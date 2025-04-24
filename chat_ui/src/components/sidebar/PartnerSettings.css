@@ -1,0 +1,609 @@
+.partner-settings-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.partner-settings-container {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.partner-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color, #eee);
+  background: var(--bg-secondary, #f9f9f9);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.partner-settings-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #333;
+}
+
+.search-bar {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  transition: border-color 0.3s;
+  margin-bottom: 15px;
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+}
+
+.create-partner-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #1677ff, #4096ff);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-weight: 500;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  margin-top: 5px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.create-partner-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, #0958d9, #1677ff);
+}
+
+.create-partner-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.plus-icon {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.partners-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  padding: 5px 20px;
+}
+
+.partner-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  height: 120px;
+  position: relative;
+  background-color: #fff;
+}
+
+.partner-card:hover {
+  border-color: #1677ff;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.partner-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f5f5f5;
+}
+
+.partner-name {
+  font-size: 14px;
+  text-align: center;
+  font-weight: 500;
+  color: #333;
+}
+
+.delete-partner-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #eee;
+  color: #ff4d4f;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s;
+}
+
+.partner-card:hover .delete-partner-btn {
+  opacity: 1;
+}
+
+.delete-partner-btn:hover {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+/* 创建搭档表单样式 */
+.create-partner-form {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #1677ff;
+  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.icon-selector {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+}
+
+.icon-option {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background-color: #f8f9fa;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-option.selected {
+  background-color: #e6f4ff;
+  border-color: #1677ff;
+  color: #1677ff;
+}
+
+.icon-option:hover {
+  background-color: #f1f3f5;
+  transform: scale(1.05);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 15px;
+}
+
+.cancel-btn,
+.save-btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 80px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.cancel-btn {
+  background-color: white;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.save-btn {
+  background-color: #1677ff;
+  border: 1px solid #1677ff;
+  color: white;
+  font-weight: 500;
+  box-shadow: none;
+  outline: none;
+}
+
+.cancel-btn {
+  background-color: white;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+.save-btn {
+  background-color: #1677ff;
+  border: 1px solid #1677ff;
+  color: white;
+  font-weight: 500;
+  box-shadow: none;
+  outline: none;
+}
+
+.cancel-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.save-btn:hover {
+  background-color: #0958d9;
+}
+
+.save-btn-disabled {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: #e8e8e8;
+  border: 1px solid #d9d9d9;
+  color: #bfbfbf;
+  cursor: not-allowed;
+  min-width: 80px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.partner-section {
+  padding: 10px 20px;
+}
+
+.section-title {
+  font-size: 16px;
+  color: #666;
+  margin: 10px 0;
+  padding-bottom: 8px;
+  font-weight: 500;
+}
+
+.partner-settings-container .form-actions .save-btn {
+  background-color: #1677ff !important;
+  color: white !important;
+}
+
+.partner-settings-modal {
+  background-color: var(--modal-backdrop, rgba(0, 0, 0, 0.5));
+  backdrop-filter: blur(5px);
+}
+
+.partner-settings-container {
+  background: var(--bg-primary, white);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.partner-settings-header {
+  border-bottom: 1px solid var(--border-color, #eee);
+  background: var(--bg-secondary, #f9f9f9);
+}
+
+.partner-settings-header h2 {
+  color: var(--text-primary, #333);
+}
+
+.close-button {
+  color: var(--text-tertiary, #666);
+}
+
+.close-button:hover {
+  background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
+  color: var(--text-primary, #333);
+}
+
+.search-bar {
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.search-bar input {
+  border: 1px solid var(--border-color, #ddd);
+  background-color: var(--bg-input, white);
+  color: var(--text-primary, #333);
+}
+
+.search-bar input:focus {
+  border-color: var(--primary-color, #1677ff);
+  box-shadow: 0 0 0 2px var(--primary-shadow, rgba(22, 119, 255, 0.1));
+}
+
+.create-partner-btn {
+  background: linear-gradient(135deg, var(--primary-color, #1677ff), var(--primary-hover, #4096ff));
+  color: white;
+  box-shadow: 0 4px 6px var(--primary-shadow, rgba(0, 0, 0, 0.1));
+}
+
+.create-partner-btn:hover {
+  background: linear-gradient(135deg, var(--primary-hover, #0958d9), var(--primary-color, #1677ff));
+  box-shadow: 0 6px 12px var(--primary-shadow, rgba(0, 0, 0, 0.15));
+}
+
+.partner-card {
+  border: 1px solid var(--border-color, #eee);
+  background-color: var(--bg-primary, #fff);
+}
+
+.partner-card:hover {
+  border-color: var(--primary-color, #1677ff);
+  box-shadow: 0 5px 15px var(--primary-shadow, rgba(0, 0, 0, 0.08));
+}
+
+.partner-icon {
+  background: var(--bg-tertiary, #f5f5f5);
+}
+
+.partner-name {
+  color: var(--text-primary, #333);
+}
+
+.delete-partner-btn {
+  background-color: var(--bg-primary-alpha, rgba(255, 255, 255, 0.8));
+  border: 1px solid var(--border-color, #eee);
+  color: var(--error-color, #ff4d4f);
+}
+
+.delete-partner-btn:hover {
+  background-color: var(--error-color, #ff4d4f);
+  color: white;
+}
+
+.form-group label {
+  color: var(--text-primary, #333);
+}
+
+.form-group input,
+.form-group textarea {
+  border: 1px solid var(--border-color, #ddd);
+  background-color: var(--bg-input, white);
+  color: var(--text-primary, #333);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--primary-color, #1677ff);
+  box-shadow: 0 0 0 2px var(--primary-shadow, rgba(22, 119, 255, 0.1));
+}
+
+.icon-option {
+  background-color: var(--bg-tertiary, #f8f9fa);
+  border: 1px solid var(--border-color, #eee);
+  color: var(--text-primary, #333);
+}
+
+.icon-option.selected {
+  background-color: var(--primary-light, #e6f4ff);
+  border-color: var(--primary-color, #1677ff);
+  color: var(--primary-color, #1677ff);
+}
+
+.icon-option:hover {
+  background-color: var(--bg-hover, #f1f3f5);
+}
+
+.cancel-btn {
+  background-color: var(--bg-primary, white);
+  border: 1px solid var(--border-color, #ddd);
+  color: var(--text-primary, #333);
+}
+
+.save-btn {
+  background-color: var(--primary-color, #1677ff);
+  border: 1px solid var(--primary-color, #1677ff);
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: var(--bg-hover, #f5f5f5);
+}
+
+.save-btn:hover {
+  background-color: var(--primary-hover, #0958d9);
+}
+
+.save-btn-disabled {
+  background-color: var(--bg-disabled, #e8e8e8);
+  border: 1px solid var(--border-color, #d9d9d9);
+  color: var(--text-disabled, #bfbfbf);
+}
+
+.section-title {
+  color: var(--text-secondary, #666);
+}
+
+.partner-settings-container .form-actions .save-btn {
+  background-color: var(--primary-color, #1677ff) !important;
+  color: white !important;
+}
+
+@media (max-width: 768px) {
+  .partner-settings-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2000;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0;
+  }
+
+  .partner-settings-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .partners-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .search-bar {
+    padding: 15px;
+  }
+
+  .partner-section {
+    padding: 5px 15px;
+  }
+}
+
+/* 返回按钮容器样式 */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 返回按钮基本样式 */
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: var(--text-secondary, #666);
+  padding: 0;
+  margin-right: 4px;
+}
+
+/* 返回按钮悬停效果 */
+.back-button:hover {
+  background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
+  color: var(--text-primary, #333);
+}
+
+/* 返回按钮激活效果 */
+.back-button:active {
+  background-color: var(--bg-active, rgba(0, 0, 0, 0.1));
+  transform: scale(0.95);
+}
+
+/* 在暗色主题下的按钮样式 */
+.theme-dark .back-button {
+  color: var(--text-secondary, #aaa);
+}
+
+.theme-dark .back-button:hover {
+  background-color: var(--bg-hover, rgba(255, 255, 255, 0.1));
+  color: var(--text-primary, #eee);
+}
+
+/* 在手机端增大返回按钮的点击区域 */
+@media (max-width: 768px) {
+  .back-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* 调整标题与返回按钮的间距 */
+  .header-left {
+    gap: 8px;
+  }
+
+  /* 增加设置标题的左边距 */
+  .settings-header h2,
+  .partner-settings-header h2 {
+    margin-left: 4px;
+  }
+}

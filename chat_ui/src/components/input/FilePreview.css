@@ -1,0 +1,178 @@
+.file-preview-container {
+  width: 100%;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  overflow: hidden;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.file-preview-container:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border-color: #d0d0d0;
+}
+
+.file-preview-container.loading {
+  background-color: #f9f9f9;
+}
+
+.file-preview-container.error {
+  background-color: #fff5f5;
+  border-color: #ffcdd2;
+}
+
+.file-preview-header {
+  padding: 10px 12px;
+  background-color: #e8e8e8;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.file-icon {
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-preview-content {
+  padding: 12px;
+  max-height: 120px;
+  overflow: hidden;
+  position: relative;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 14px;
+}
+
+.file-preview-text {
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+  color: #333;
+  white-space: pre-wrap;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* 加载中动画 */
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #1677ff;
+  animation: spin 1s ease-in-out infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 全屏模态框 */
+.file-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.file-modal-container {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 1000px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.file-modal-header {
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+}
+
+.file-modal-header .file-name {
+  flex: 1;
+  font-size: 16px;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+.file-modal-content {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+  background-color: #fff;
+}
+
+.file-content-full {
+  font-family: monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  white-space: pre-wrap;
+  color: #333;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .file-modal-container {
+    width: 95%;
+    max-height: 80vh;
+  }
+
+  .file-modal-header {
+    padding: 10px 12px;
+  }
+
+  .file-modal-content {
+    padding: 12px;
+  }
+
+  .file-content-full {
+    font-size: 13px;
+  }
+}

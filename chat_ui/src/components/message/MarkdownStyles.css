@@ -1,0 +1,445 @@
+/* 基础文本样式 */
+.markdown-content {
+  font-size: 14px;
+  line-height: 1.2;
+  color: #262626;
+  text-align: left;
+}
+
+/* 标题样式*/
+.markdown-content h1 {
+  font-size: 1.8em;
+  margin: 8px 0 6px 0;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.markdown-content h2 {
+  font-size: 1.5em;
+  margin: 8px 0 6px 0;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.markdown-content h3 {
+  font-size: 1.3em;
+  margin: 8px 0 6px 0;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.markdown-content h4 {
+  font-size: 1.2em;
+  margin: 8px 0 6px 0;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.markdown-content h5 {
+  font-size: 1.1em;
+  margin: 8px 0 6px 0;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.markdown-content h6 {
+  font-size: 1em;
+  margin: 8px 0 6px 0;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+/* 段落样式*/
+.markdown-content p {
+  margin: 4px 0;
+  line-height: 1.2;
+}
+
+/* 列表样式 */
+.markdown-content ul,
+.markdown-content ol {
+  margin: 4px 0;
+  padding-left: 18px;
+}
+
+.markdown-content li {
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+/* 嵌套列表样式 */
+.markdown-content li > ul,
+.markdown-content li > ol {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+/* 代码块样式 */
+.markdown-content pre {
+  margin: 4px 0;
+  border-radius: 6px;
+  overflow: auto;
+}
+
+/* 内联代码样式 */
+.markdown-content code:not(pre code) {
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.9em;
+  background-color: #f0f0f0;
+  color: #476582;
+}
+
+/* 语法高亮 */
+.markdown-content .syntax-highlighter {
+  margin: 0;
+  border-radius: 6px;
+  overflow: auto;
+}
+
+/* 引用块样式 */
+.markdown-content blockquote {
+  border-left: 4px solid #d9d9d9;
+  padding-left: 8px;
+  margin: 4px 0 4px 4px;
+  color: #666;
+  background-color: #fafafa;
+  border-radius: 0 4px 4px 0;
+}
+
+/* 表格样式 */
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 6px 0;
+  font-size: 0.9em;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid #ddd;
+  padding: 4px 8px;
+  text-align: left;
+}
+
+.markdown-content th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+.markdown-content .table-container {
+  overflow-x: auto;
+  margin: 6px 0;
+}
+
+/* 水平线样式 */
+.markdown-content hr {
+  height: 1px;
+  border: none;
+  background-color: #e0e0e0;
+  margin: 8px 0;
+}
+
+/* 链接样式 */
+.markdown-content a {
+  color: #1677ff;
+  text-decoration: underline;
+}
+
+.markdown-content a:hover {
+  color: #0f5bdb;
+}
+
+/* 图片样式 */
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 6px;
+  margin: 4px 0;
+}
+
+/* LaTeX数学公式样式 */
+.markdown-content .katex-display {
+  margin: 6px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.markdown-content .katex {
+  font-size: 1.1em;
+}
+
+/* Mermaid图表样式 */
+.markdown-content .mermaid {
+  margin: 8px 0;
+  text-align: center;
+}
+
+/* 优化不同元素间的间距 */
+.markdown-content h1 + p,
+.markdown-content h2 + p,
+.markdown-content h3 + p,
+.markdown-content h4 + p,
+.markdown-content h5 + p,
+.markdown-content h6 + p {
+  margin-top: 2px;
+}
+
+.markdown-content p + ul,
+.markdown-content p + ol {
+  margin-top: 2px;
+}
+
+.markdown-content p + h1,
+.markdown-content p + h2,
+.markdown-content p + h3,
+.markdown-content p + h4,
+.markdown-content p + h5,
+.markdown-content p + h6 {
+  margin-top: 8px;
+}
+
+/* 强调和加粗 */
+.markdown-content em {
+  font-style: italic;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+}
+
+/* 删除线 */
+.markdown-content del {
+  text-decoration: line-through;
+}
+
+/* 自定义容器 */
+.markdown-content .custom-block {
+  margin: 6px 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  border-left: 4px solid #e0e0e0;
+}
+
+.markdown-content .custom-block.info {
+  background-color: #e8f4fd;
+  border-left-color: #1677ff;
+}
+
+.markdown-content .custom-block.success {
+  background-color: #edf9e8;
+  border-left-color: #52c41a;
+}
+
+.markdown-content .custom-block.warning {
+  background-color: #fff8e6;
+  border-left-color: #faad14;
+}
+
+.markdown-content .custom-block.danger {
+  background-color: #fff1f0;
+  border-left-color: #ff4d4f;
+}
+
+/* 键盘按键样式 */
+.markdown-content kbd {
+  display: inline-block;
+  padding: 1px 4px;
+  font-size: 0.9em;
+  line-height: 1;
+  color: #444;
+  vertical-align: middle;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+  margin: 0 2px;
+}
+
+/* 任务列表样式 */
+.markdown-content input[type="checkbox"] {
+  margin-right: 4px;
+}
+
+.markdown-content .task-list-item {
+  list-style-type: none;
+}
+
+.markdown-content .task-list-item-checkbox {
+  margin: 0 0.2em 0 -1.4em;
+}
+
+/* 代码块内的行号 */
+.markdown-content .code-line-numbers {
+  color: #999;
+  padding-right: 8px;
+  text-align: right;
+  user-select: none;
+}
+
+/* 脚注样式 */
+.markdown-content .footnote {
+  font-size: 0.9em;
+  color: #777;
+  margin-top: 12px;
+  padding-top: 6px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.markdown-content .footnote-ref {
+  font-size: 0.8em;
+  vertical-align: super;
+  margin: 0 2px;
+  color: #1677ff;
+}
+
+/* 特别处理三重引号代码块 */
+.markdown-content pre code {
+  line-height: 1.2;
+}
+
+
+/* 极度紧凑的设置 */
+.markdown-content {
+  line-height: 1 !important;
+}
+
+.markdown-content p,
+.markdown-content li,
+.markdown-content ul,
+.markdown-content ol {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  line-height: 1 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* 标题极度紧凑 */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  margin-top: 2px !important;
+  margin-bottom: 0 !important;
+  line-height: 1 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.markdown-content li + li {
+  margin-top: 0 !important;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  padding-left: 12px !important;
+}
+
+.markdown-content > * + * {
+  margin-top: 1px !important;
+}
+
+.markdown-content pre,
+.markdown-content code {
+  margin: 1px 0 !important;
+  padding: 1px 2px !important;
+}
+
+.markdown-content th,
+.markdown-content td {
+  padding: 1px 4px !important;
+  line-height: 1 !important;
+}
+
+
+
+.markdown-content table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  margin: 6px 0 !important;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+}
+
+/* 表头样式 */
+.markdown-content th {
+  background-color: #f0f2f5;
+  color: #1f2329;
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 12px !important;
+  border: none;
+  border-bottom: 2px solid #e8e8e8;
+  position: relative;
+  line-height: 1.5 !important;
+}
+
+/* 常规单元格样式 */
+.markdown-content td {
+  padding: 8px 12px !important;
+  border: none;
+  border-bottom: 1px solid #e8e8e8;
+  line-height: 1.5 !important;
+  transition: background-color 0.2s;
+  color: #333;
+}
+
+/* 数字列右对齐 */
+.markdown-content td.numeric {
+  text-align: right;
+}
+
+/* 斑马纹效果 */
+.markdown-content tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+/* 行悬停效果 */
+.markdown-content tr:hover {
+  background-color: #e6f7ff;
+}
+
+/* 表格容器 */
+.markdown-content .table-container {
+  margin: 8px 0 !important;
+  border-radius: 8px;
+  overflow-x: auto;
+  position: relative;
+  background-color: white;
+}
+
+/* 表格悬停阴影效果 */
+.markdown-content .table-container:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+
+.markdown-content tr:first-child th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.markdown-content tr:first-child th:last-child {
+  border-top-right-radius: 8px;
+}
+
+.markdown-content tr:last-child td:first-child {
+  border-bottom-left-radius: 8px;
+}
+
+.markdown-content tr:last-child td:last-child {
+  border-bottom-right-radius: 8px;
+}
+
+.markdown-content tr:last-child td {
+  border-bottom: none;
+}

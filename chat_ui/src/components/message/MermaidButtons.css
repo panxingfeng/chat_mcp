@@ -1,0 +1,183 @@
+.mermaid-with-buttons {
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #30363d;
+  background-color: #161b22;
+  position: relative;
+}
+
+/* 代码容器样式 */
+.mermaid-with-buttons .code-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.mermaid-with-buttons .code-container pre {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
+}
+
+/* 按钮容器样式 */
+.mermaid-with-buttons .buttons-container {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* 鼠标悬停时显示按钮 */
+.mermaid-with-buttons:hover .buttons-container {
+  opacity: 1;
+}
+
+/* 按钮基础样式 */
+.mermaid-with-buttons .code-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* 复制按钮 */
+.mermaid-with-buttons .copy-button {
+  background-color: rgba(36, 41, 47, 0.8);
+}
+
+.mermaid-with-buttons .copy-button:hover {
+  background-color: rgba(46, 51, 57, 0.9);
+}
+
+.mermaid-with-buttons .copy-button.success {
+  background-color: #2cbe4e;
+}
+
+/* 渲染按钮 */
+.mermaid-with-buttons .render-button {
+  background-color: rgba(0, 92, 197, 0.8);
+}
+
+.mermaid-with-buttons .render-button:hover {
+  background-color: rgba(0, 112, 237, 0.9);
+}
+
+.mermaid-with-buttons .render-button.active {
+  background-color: #2cbe4e;
+}
+
+.mermaid-with-buttons .render-button:disabled {
+  background-color: rgba(88, 166, 255, 0.5);
+  cursor: not-allowed;
+}
+
+/* 错误显示样式 */
+.mermaid-with-buttons .render-error {
+  padding: 12px 16px;
+  background-color: rgba(248, 81, 73, 0.15);
+  color: #f85149;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-top: 1px solid #f85149;
+}
+
+.mermaid-with-buttons .error-icon {
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.mermaid-with-buttons .error-message {
+  flex: 1;
+}
+
+.mermaid-with-buttons .error-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.mermaid-with-buttons .error-details {
+  font-size: 13px;
+  color: #e6edf3;
+  word-break: break-word;
+}
+
+/* 渲染结果容器 */
+.mermaid-with-buttons .render-result {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.3s ease-in-out;
+  background-color: #fff;
+  border-top: 1px solid #30363d;
+}
+
+.mermaid-with-buttons .render-result.visible {
+  height: auto;
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Mermaid渲染容器 */
+.mermaid-with-buttons .mermaid-render-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* 适应暗色主题 */
+@media (prefers-color-scheme: dark) {
+  .mermaid-with-buttons {
+    border-color: #30363d;
+    background-color: #0d1117;
+  }
+
+  .mermaid-with-buttons .render-result {
+    background-color: #0d1117;
+  }
+
+  .mermaid-with-buttons .code-button {
+    background-color: rgba(48, 54, 61, 0.8);
+  }
+
+  .mermaid-with-buttons .copy-button:hover {
+    background-color: rgba(48, 54, 61, 1);
+  }
+
+  .mermaid-with-buttons .render-button {
+    background-color: rgba(56, 139, 253, 0.8);
+  }
+
+  .mermaid-with-buttons .render-button:hover {
+    background-color: rgba(56, 139, 253, 1);
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .mermaid-with-buttons .buttons-container {
+    opacity: 1;
+    top: 4px;
+    right: 4px;
+  }
+
+  .mermaid-with-buttons .code-button {
+    padding: 4px 8px;
+  }
+
+  .mermaid-with-buttons .code-button span {
+    display: none;
+  }
+}

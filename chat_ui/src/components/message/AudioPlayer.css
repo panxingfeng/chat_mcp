@@ -1,0 +1,154 @@
+.audio-player {
+  width: 100%;
+  background-color: #e6f7ff;
+  border-radius: 12px;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #bae7ff;
+}
+
+.audio-player.error {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+}
+
+/* 播放控制区域 */
+.audio-player-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.play-pause-button {
+  background: linear-gradient(135deg, #1677ff, #0f5bdb);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(22, 119, 255, 0.4);
+}
+
+.play-pause-button:hover {
+  background: linear-gradient(135deg, #0f5bdb, #0d4fa8);
+}
+
+.play-pause-button:disabled {
+  background: #d9d9d9;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.play-pause-button svg {
+  fill: white;
+  width: 16px;
+  height: 16px;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.time-display {
+  font-size: 12px;
+  color: #7a8499;
+  min-width: 40px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 进度条容器 */
+.progress-container {
+  flex-grow: 1;
+  position: relative;
+  height: 6px;
+  cursor: pointer;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #e0e0e0;
+  border-radius: 3px;
+}
+
+.progress-filled {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(to right, #1677ff, #36a2ff);
+  border-radius: 3px;
+  transition: width 0.1s;
+}
+
+.progress-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #1677ff;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.progress-slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #1677ff;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.progress-slider:disabled {
+  cursor: not-allowed;
+}
+
+/* 错误消息样式 */
+.audio-error-message {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  color: #ff4d4f;
+  font-size: 13px;
+  background-color: #fff2f0;
+  border-radius: 6px;
+}
+
+.error-icon {
+  margin-right: 8px;
+}

@@ -1,0 +1,197 @@
+/* 通用设置 */
+:root {
+  --latex-primary-color: #333333;
+  --latex-bg-color: #ffffff;
+  --latex-error-color: #f44336;
+  --latex-error-bg: #ffebee;
+  --latex-font-size: 1.1em;
+  --latex-line-height: 1.2;
+  --latex-margin: 12px 0;
+  --latex-padding: 8px 0;
+  --latex-border-radius: 4px;
+  --latex-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* 块级公式容器 */
+.math-display,
+.latex-block {
+  display: block;
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--latex-padding);
+  margin: var(--latex-margin);
+  text-align: center;
+  color: var(--latex-primary-color);
+  border-radius: var(--latex-border-radius);
+  background-color: var(--latex-bg-color);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* 在宽度不足时显示滚动提示 */
+.math-display::after,
+.latex-block::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.8));
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.math-display:hover::after,
+.latex-block:hover::after {
+  opacity: 1;
+}
+
+/* 行内公式样式 */
+.math-inline {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  padding: 0 2px;
+  font-size: var(--latex-font-size);
+  line-height: var(--latex-line-height);
+}
+
+/* 错误提示样式 */
+.latex-error {
+  color: var(--latex-error-color);
+  background-color: var(--latex-error-bg);
+  padding: 6px 10px;
+  border-radius: var(--latex-border-radius);
+  border-left: 3px solid var(--latex-error-color);
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  margin: 8px 0;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  font-size: 0.9em;
+  box-shadow: var(--latex-box-shadow);
+}
+
+/* KaTeX 渲染优化 */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 1em 0;
+  padding: 0;
+  text-align: center;
+}
+
+.katex-display > .katex {
+  display: inline-block;
+  white-space: nowrap;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* 自动处理长公式 */
+.markdown-content .katex-display > .katex {
+  display: table;
+  margin: 0 auto;
+}
+
+/* 字体与排版优化 */
+.markdown-content .katex,
+.math-inline .katex {
+  font-size: var(--latex-font-size);
+  line-height: var(--latex-line-height);
+}
+
+/* 矩阵环境优化 */
+.katex .pmatrix > .col-align,
+.katex .matrix > .col-align,
+.katex .bmatrix > .col-align {
+  text-align: center;
+  padding: 0 0.5em;
+}
+
+/* 公式环境的空间优化 */
+.markdown-content .math-display,
+.markdown-content .latex-block {
+  margin-top: 16px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: rgba(0, 0, 0, 0.01);
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.markdown-content .math-display:hover,
+.markdown-content .latex-block:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* KaTeX HTML 元素优化 */
+.katex-html {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 移动设备适配 */
+@media screen and (max-width: 768px) {
+  :root {
+    --latex-font-size: 1em;
+    --latex-margin: 10px 0;
+    --latex-padding: 6px 0;
+  }
+
+  .math-display,
+  .latex-block {
+    max-width: calc(100vw - 30px);
+    font-size: 0.95em;
+  }
+
+  .katex {
+    font-size: 1em !important;
+  }
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --latex-primary-color: #e0e0e0;
+    --latex-bg-color: #2c2c2c;
+    --latex-error-color: #ff6b6b;
+    --latex-error-bg: #3d2828;
+  }
+
+  .markdown-content .math-display,
+  .markdown-content .latex-block {
+    border-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .markdown-content .math-display:hover,
+  .markdown-content .latex-block:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .math-display::after,
+  .latex-block::after {
+    background: linear-gradient(to right, transparent, rgba(44, 44, 44, 0.8));
+  }
+}
+
+/* 打印优化 */
+@media print {
+  .math-display,
+  .latex-block,
+  .math-inline {
+    overflow: visible;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .katex-display {
+    overflow: visible;
+  }
+}

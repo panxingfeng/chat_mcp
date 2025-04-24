@@ -1,0 +1,395 @@
+/* Markdown容器样式 */
+.markdown-container {
+  background-color: #fff;
+  border-radius: 12px;
+  margin: 10px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Markdown目录样式 */
+.markdown-toc {
+  padding: 15px 20px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #eaeaea;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.markdown-toc h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #333;
+}
+
+.markdown-toc ul {
+  padding-left: 20px;
+  margin: 0;
+  list-style-type: none;
+}
+
+.markdown-toc li {
+  margin: 5px 0;
+}
+
+.markdown-toc a {
+  color: #1677ff;
+  text-decoration: none;
+  transition: color 0.2s;
+  display: block;
+  padding: 2px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.markdown-toc a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+/* 不同级别目录的缩进 */
+.toc-level-1 {
+  margin-left: 0;
+  font-weight: 600;
+}
+
+.toc-level-2 {
+  margin-left: 15px;
+  font-weight: 500;
+}
+
+.toc-level-3 {
+  margin-left: 30px;
+}
+
+.toc-level-4 {
+  margin-left: 45px;
+  font-size: 0.95em;
+}
+
+.toc-level-5, .toc-level-6 {
+  margin-left: 60px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+/* Markdown内容样式 */
+.markdown-content {
+  padding: 20px;
+  font-size: 16px;
+}
+
+/* 标题样式 */
+.markdown-content h1 {
+  font-size: 28px;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 8px;
+  margin: 25px 0 15px;
+  scroll-margin-top: 20px; /* 锚点跳转时的顶部边距 */
+}
+
+.markdown-content h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 6px;
+  margin: 20px 0 15px;
+  scroll-margin-top: 20px;
+}
+
+.markdown-content h3 {
+  font-size: 20px;
+  margin: 18px 0 12px;
+  scroll-margin-top: 20px;
+}
+
+.markdown-content h4 {
+  font-size: 18px;
+  margin: 15px 0 10px;
+  scroll-margin-top: 20px;
+}
+
+.markdown-content h5 {
+  font-size: 16px;
+  margin: 12px 0 8px;
+  scroll-margin-top: 20px;
+}
+
+.markdown-content h6 {
+  font-size: 15px;
+  margin: 10px 0 8px;
+  color: #6a737d;
+  scroll-margin-top: 20px;
+}
+
+/* 段落样式 */
+.markdown-content p {
+  margin: 12px 0;
+  line-height: 1.7;
+}
+
+/* 列表样式 */
+.markdown-content ul, .markdown-content ol {
+  padding-left: 30px;
+  margin: 15px 0;
+}
+
+.markdown-content li {
+  margin: 5px 0;
+  line-height: 1.7;
+}
+
+/* 块引用样式 */
+.markdown-content blockquote {
+  border-left: 4px solid #dfe2e5;
+  padding: 0 15px;
+  margin: 15px 0;
+  color: #6a737d;
+  background-color: #f8f9fa;
+  border-radius: 0 4px 4px 0;
+}
+
+.markdown-content blockquote > :first-child {
+  margin-top: 0;
+}
+
+.markdown-content blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* 代码样式 */
+.markdown-content code {
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  background-color: rgba(27, 31, 35, 0.05);
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 85%;
+}
+
+.markdown-content pre {
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  padding: 16px;
+  overflow: auto;
+  margin: 16px 0;
+  border: 1px solid #eaecef;
+}
+
+.markdown-content pre > code {
+  background-color: transparent;
+  padding: 0;
+  font-size: 90%;
+  line-height: 1.5;
+  display: block;
+  white-space: pre;
+}
+
+/* 支持语法高亮的代码块 */
+.markdown-content .language-json {
+  color: #032f62;
+}
+
+.markdown-content .language-javascript {
+  color: #24292e;
+}
+
+/* 水平线样式 */
+.markdown-content hr {
+  height: 1px;
+  background-color: #e1e4e8;
+  border: none;
+  margin: 20px 0;
+}
+
+/* 链接样式 */
+.markdown-content a {
+  color: #1677ff;
+  text-decoration: none;
+}
+
+.markdown-content a:hover {
+  text-decoration: underline;
+}
+
+/* 引用标记样式 */
+.markdown-content .citation {
+  color: #1677ff;
+  text-decoration: none;
+}
+
+.markdown-content .citation sup {
+  padding: 0 3px;
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+  top: -0.5em;
+}
+
+/* 表格样式 */
+.markdown-content table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 15px 0;
+  overflow: auto;
+  display: block;
+}
+
+.markdown-content table th {
+  font-weight: 600;
+  background-color: #f6f8fa;
+}
+
+.markdown-content table td, .markdown-content table th {
+  border: 1px solid #dfe2e5;
+  padding: 8px 12px;
+}
+
+.markdown-content table tr:nth-child(2n) {
+  background-color: #f8f8f8;
+}
+
+/* 强调和重点样式 */
+.markdown-content em {
+  font-style: italic;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+}
+
+/* 参考文献样式 */
+.markdown-content .references {
+  margin-top: 40px;
+  border-top: 1px solid #eaecef;
+  padding-top: 20px;
+}
+
+.markdown-content .references h2 {
+  font-size: 24px;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.markdown-content .references ol {
+  padding-left: 30px;
+}
+
+.markdown-content .references li {
+  margin: 8px 0;
+  word-break: break-word;
+}
+
+.markdown-content .references a {
+  color: #0366d6;
+}
+
+/* 摘要样式 */
+.markdown-content .abstract {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  margin: 15px 0 25px 0;
+  line-height: 1.7;
+  border-left: 4px solid #1677ff;
+}
+
+.markdown-content .abstract p {
+  margin: 6px 0;
+}
+
+/* 响应式样式 */
+@media (max-width: 768px) {
+  .markdown-content {
+    padding: 15px;
+  }
+
+  .markdown-content h1 {
+    font-size: 24px;
+  }
+
+  .markdown-content h2 {
+    font-size: 20px;
+  }
+
+  .markdown-content h3 {
+    font-size: 18px;
+  }
+
+  .markdown-content pre {
+    padding: 12px;
+  }
+
+  .markdown-toc {
+    max-height: 50vh;
+  }
+}
+
+/* 打印样式优化 */
+@media print {
+  .markdown-container {
+    box-shadow: none;
+    margin: 0;
+  }
+
+  .markdown-toc {
+    display: none;
+  }
+
+  .markdown-content {
+    font-size: 12pt;
+  }
+
+  .markdown-content a {
+    color: #000;
+    text-decoration: none;
+  }
+
+  .markdown-content a::after {
+    content: " (" attr(href) ")";
+    font-size: 90%;
+    color: #666;
+  }
+
+  .markdown-content pre, .markdown-content code {
+    border: 1px solid #ddd;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+}
+
+/* 目录折叠按钮（可选功能） */
+.markdown-toc-toggle {
+  background-color: #f1f1f1;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.markdown-toc-toggle svg {
+  margin-right: 5px;
+  transition: transform 0.3s;
+}
+
+.markdown-toc-toggle.collapsed svg {
+  transform: rotate(-90deg);
+}
+
+/* 引用编号样式 */
+.markdown-content sup {
+  color: #1677ff;
+}
