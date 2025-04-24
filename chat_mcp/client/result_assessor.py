@@ -229,11 +229,13 @@ class ResultAssessor:
         }
 
     async def assess_final_state(
-            self,
-            user_query: str,
-            all_tool_results: List[Dict[str, Any]]
+        self,
+        user_query: str,
+        all_tool_results: List[Dict[str, Any]]
     ) -> Dict[str, Any]:
-        """评估所有工具执行后的最终状态"""
+        """
+        评估执行计划完成情况
+        """
         if not all_tool_results:
             return {
                 "problem_solved": False,
@@ -265,6 +267,30 @@ class ResultAssessor:
                 "generate_final": final_state.get("generate_final", False),
                 "partially_solved": final_state.get("solution_level") == "部分解决"
             }
+            
+            if not result["problem_solved"] and not result["need_more_tools"]:
+                has_async_signs = False
+                
+                if all_tool_results:
+                    last_result = all_tool_results[-1]["result"]
+                    async_keywords = ["任务ID", "进度", "生成中", "处理中", "等待", "排队中"]
+                    if any(keyword in last_result for keyword in async_keywords):
+                        has_async_signs = True
+                
+                if "remaining_tasks" in final_state:
+                    wait_tasks = [task for task in final_state["remaining_tasks"] 
+                                if any(word in task.lower() for word in ["等待", "检查", "获取", "查询"])]
+                    if wait_tasks:
+                        has_async_signs = True
+                
+                if has_async_signs:
+                    result["need_more_tools"] = True
+                    result["reason"] += " (系统检测到异步任务仍在进行中，需要继续轮询进度)"
+                    logger.info("检测到异步任务标志，强制设置need_more_tools=True")
+
+            for key, value in final_state.items():
+                if key not in result:
+                    result[key] = value
 
             logger.info(f"最终状态评估: {result}")
             return result

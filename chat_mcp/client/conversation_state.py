@@ -202,7 +202,6 @@ class ConversationExecutor:
 
                         async for chunk in stream:
                             if hasattr(chunk.choices[0].delta, 'content') and chunk.choices[0].delta.content:
-                                print(f"chunk.choices[0].delta.content: {chunk.choices[0].delta.content}")
                                 yield chunk.choices[0].delta.content
 
                 else:

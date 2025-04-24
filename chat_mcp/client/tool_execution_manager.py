@@ -6,8 +6,9 @@ from enum import Enum
 
 from openai import OpenAI
 from chat_mcp.prompt.tool_prompt import GEN_FINAL_SUMMARY
-from chat_mcp.utils.create_completion import create_stream_completion
+from chat_mcp.utils.create_completion import create_completion, create_stream_completion
 from chat_mcp.utils.get_logger import get_logger
+from config.config import MAX_ITERATIONS
 
 logger = get_logger("ToolExecutionManager")
 
@@ -86,12 +87,11 @@ class ToolExecutionPlan:
         available_tools = []
         for tool in self.tools:
             tool_name = tool.get("function", {}).get("name")
-            if tool_name not in self.tool_results:
-                tool_description = tool.get("function", {}).get("description", "")
-                available_tools.append({
-                    "name": tool_name,
-                    "description": tool_description
-                })
+            tool_description = tool.get("function", {}).get("description", "")
+            available_tools.append({
+                "name": tool_name,
+                "description": tool_description
+            })
 
         if not available_tools:
             return ""
@@ -122,7 +122,10 @@ class ToolExecutionPlan:
         2. 判断问题是否已解决
         3. 如果问题已解决，请返回空字符串 ""
         4. 如果问题未解决，请从可用工具列表中选择最合适的下一个工具名称
-        5. 支持调用同一个工具多次
+        5. 对于异步任务（如图像生成）：
+        - 如果任务提交成功但尚未完成，应继续查询任务进度
+        - 直到任务真正完成，才能判断问题已解决
+        6. 支持调用同一个工具多次
         
         只返回工具名称或空字符串，不要有任何额外解释。
         """
@@ -139,11 +142,9 @@ class ToolExecutionPlan:
                 messages=messages,
                 temperature=0.2
             )
-            print("response:\n", response)
             
             next_tool = response.choices[0].message.content.strip()
             
-            # 验证返回的工具是否在可用列表中
             available_tool_names = [tool["name"] for tool in available_tools]
             if next_tool and next_tool not in available_tool_names:
                 logger.warning(f"LLM返回的工具 '{next_tool}' 不在可用工具列表中，将使用默认选择")
@@ -160,13 +161,7 @@ class ToolExecutionPlan:
         """
         检查执行计划是否已完成
         """
-        if self.completed:
-            return True
-
-        if len(self.tool_results) == len(self.tools):
-            return True
-
-        return False
+        return self.completed
 
     def set_completed(self, completed: bool, reason: str = ""):
         """
@@ -188,7 +183,7 @@ class ToolExecutionPlan:
 
 
 class ToolParameterSetter:
-    """工具参数设置器，使用AI为工具设置参数"""
+    """工具参数设置器"""
     def __init__(self, llm_client: OpenAI, model: str):
         self.llm_client = llm_client
         self.model = model
@@ -282,12 +277,152 @@ class ToolExecutionManager:
         """
         按照执行计划执行工具
         """
-        while not plan.is_complete():
+        iteration_count = 0
+        
+        while not plan.is_complete() and iteration_count < MAX_ITERATIONS:
+            iteration_count += 1
+            logger.info(f"工具执行迭代 {iteration_count}/{MAX_ITERATIONS}, plan.is_complete={plan.is_complete()}")
+            
             next_tool_name = await plan.determine_next_tool_with_llm(self.llm_client, self.model)
-            print("next_tool_name:\n", next_tool_name)
+            logger.info(f"LLM选择的下一个工具: {next_tool_name}")
+            
             if not next_tool_name:
-                plan.set_completed(True, "LLM判断问题已解决，不需要执行更多工具")
-                break
+                logger.info("LLM未提供下一个工具，进行额外检查")
+                needs_more = False
+                
+                if plan.execution_order:
+                    previous_results = []
+                    for tool_name in plan.execution_order:
+                        previous_results.append({
+                            "tool_name": tool_name,
+                            "result": plan.tool_results.get(tool_name, {}).get("result", "")
+                        })
+                    
+                    final_state = await self.result_assessor.assess_final_state(
+                        user_query=plan.user_query,
+                        all_tool_results=previous_results
+                    )
+                    
+                    needs_more = final_state.get("need_more_tools", False)
+                    logger.info(f"额外评估结果: need_more_tools={needs_more}")
+                    
+                    if not final_state.get("problem_solved", False) and not needs_more:
+                        logger.info("问题未解决但评估表示不需要更多工具，进行二次确认")
+                        tools_context = ""
+                        for i, tool_name in enumerate(plan.execution_order):
+                            result = plan.tool_results.get(tool_name, {}).get("result", "")
+                            tools_context += f"\n工具 {i+1}: {tool_name}\n结果: {result}\n"
+                        
+                        confirm_messages = [
+                            {"role": "system", "content": f"""
+                            请分析以下工具执行结果，确认是否需要继续轮询任务状态:
+                            
+                            用户查询: {plan.user_query}
+                            工具执行历史:
+                            {tools_context}
+                            
+                            特别关注以下情况:
+                            1. 如果有任何异步任务(如图像生成、文件处理等)正在进行中
+                            2. 如果结果中包含"任务ID"、"进度"、"生成中"等表示未完成的状态
+                            3. 如果用户问题明显未解决，但还需要继续查询结果
+                            
+                            只返回JSON格式:
+                            {{
+                                "continue_polling": boolean,
+                                "reason": "简要说明理由",
+                                "suggested_tool": "建议使用的工具名称(如有)"
+                            }}
+                            """},
+                            {"role": "user", "content": "请分析是否需要继续轮询"}
+                        ]
+                        
+                        try:
+                            confirm_response = await create_completion(
+                                logger=logger,
+                                llm_client=self.llm_client,
+                                model=self.model,
+                                messages=confirm_messages,
+                                temperature=0.1
+                            )
+                            
+                            confirm_content = confirm_response.choices[0].message.content
+                            logger.info(f"二次确认结果: {confirm_content}")
+                            
+                            try:
+                                confirm_data = json.loads(confirm_content)
+                                if confirm_data.get("continue_polling", False):
+                                    needs_more = True
+                                    suggested_tool = confirm_data.get("suggested_tool", "")
+                                    if suggested_tool and suggested_tool in [t.get("function", {}).get("name") for t in plan.tools]:
+                                        next_tool_name = suggested_tool
+                                        logger.info(f"二次确认建议继续轮询，使用工具: {next_tool_name}")
+                                    else:
+                                        logger.info(f"二次确认建议继续轮询，但未指定工具")
+                                else:
+                                    logger.info("二次确认结果: 不需要继续轮询")
+                            except json.JSONDecodeError:
+                                logger.info("JSON解析失败，尝试正则提取")
+                                if "true" in confirm_content.lower() and "continue_polling" in confirm_content.lower():
+                                    needs_more = True
+                                    logger.info("通过正则判断需要继续轮询")
+                        except Exception as e:
+                            logger.error(f"二次确认出错: {str(e)}")
+                
+                if not needs_more:
+                    logger.info("最终判断: 不需要更多工具，设置plan.completed=True")
+                    plan.set_completed(True, "LLM判断问题已解决，不需要执行更多工具")
+                    break
+                else:
+                    if not next_tool_name:
+                        logger.info("需要更多工具但LLM未提供，重新尝试获取下一个工具")
+                        
+                        prompt_messages = [
+                            {"role": "system", "content": f"""
+                            你需要为继续解决用户问题选择最合适的工具。
+                            
+                            用户查询: {plan.user_query}
+                            
+                            已执行的工具和结果:
+                            {tools_context}
+                            
+                            可用工具列表:
+                            {", ".join([t.get("function", {}).get("name") for t in plan.tools])}
+                            
+                            系统分析表明用户问题尚未解决，需要继续使用工具。
+                            请选择一个最合适的工具来继续处理，尤其是检查任务进度或获取任务结果的工具。
+                            只返回工具名称，不要添加任何解释。
+                            """},
+                            {"role": "user", "content": "请选择下一个工具"}
+                        ]
+                        
+                        try:
+                            tool_response = await create_completion(
+                                logger=logger,
+                                llm_client=self.llm_client,
+                                model=self.model,
+                                messages=prompt_messages,
+                                temperature=0.1
+                            )
+                            
+                            next_tool_name = tool_response.choices[0].message.content.strip()
+                            logger.info(f"重新获取的工具名称: {next_tool_name}")
+                            
+                            valid_tools = [t.get("function", {}).get("name") for t in plan.tools]
+                            if next_tool_name not in valid_tools:
+                                logger.info(f"工具名称无效，查找进度查询相关工具")
+                                progress_tools = [t for t in valid_tools if "progress" in t.lower() or "状态" in t or "进度" in t]
+                                if progress_tools:
+                                    next_tool_name = progress_tools[0]
+                                    logger.info(f"找到进度查询工具: {next_tool_name}")
+                                else:
+                                    next_tool_name = None
+                        except Exception as e:
+                            logger.error(f"重新获取工具名称出错: {str(e)}")
+                        
+                        if not next_tool_name:
+                            logger.info("仍未获取到有效工具名称，终止循环")
+                            plan.set_completed(True, "无法确定下一个工具，停止执行")
+                            break
             
             next_tool = None
             for tool in plan.tools:
@@ -296,37 +431,66 @@ class ToolExecutionManager:
                     break
             
             if not next_tool:
+                logger.info(f"找不到工具: {next_tool_name}")
                 plan.set_completed(True, f"找不到工具: {next_tool_name}")
                 break
+            
+            logger.info(f"准备执行工具: {next_tool_name}")
             
             async for result in self._execute_single_tool(next_tool, plan):
                 yield result
                 
                 if result.get("processed") and result.get("assessment", {}).get("problem_solved", False):
+                    logger.info("工具执行结果表明问题已解决，设置plan.completed=True")
                     plan.set_completed(True, "工具执行结果表明问题已解决")
                     break
+            
+            logger.info(f"完成工具执行: {next_tool_name}, plan.is_complete={plan.is_complete()}")
 
+        logger.info(f"工具执行循环结束: 迭代次数={iteration_count}, plan.is_complete={plan.is_complete()}")
+
+        generate_summary = False
         if plan.is_complete():
+            logger.info("计划完成，准备生成最终总结")
             final_assessment = await self._assess_plan_completion(plan)
+            generate_summary = True
             yield {
                 "final_assessment": final_assessment,
                 "should_generate_final": True,
             }
-
+        else:
+            logger.info("计划未完成，进行最终评估")
+            final_assessment = await self._assess_plan_completion(plan)
+            logger.info(f"最终评估结果: {final_assessment}")
+            
+            if iteration_count >= 3:
+                logger.info("迭代次数达到阈值，生成临时总结")
+                generate_summary = True
+                yield {
+                    "final_assessment": final_assessment,
+                    "should_generate_final": True,
+                    "message": "已达到迭代次数上限，生成临时总结"
+                }
+            else:
+                logger.info("不生成总结")
+                yield {
+                    "final_assessment": final_assessment,
+                    "should_generate_final": False
+                }
+        
+        if generate_summary:
+            logger.info("开始生成总结")
             try:
                 async for chunk in self.generate_final_summary(plan, temperature):
                     yield chunk
             except Exception as e:
-                logger.error(f"生成最终总结失败: {str(e)}")
+                logger.error(f"生成总结失败: {str(e)}")
                 yield {
-                    "error": "生成总结时发生错误。"
+                    "error": "生成总结时发生错误。",
+                    "message": f"生成总结失败: {str(e)}"
                 }
-        else:
-            final_assessment = await self._assess_plan_completion(plan)
-            yield {
-                "final_assessment": final_assessment,
-                "should_generate_final": False
-            }
+    
+    logger.info("工具执行过程完全结束")
 
     async def _execute_single_tool(self,
                                    tool: Dict[str, Any],
@@ -464,7 +628,7 @@ class ToolExecutionManager:
 
     async def generate_final_summary(self, plan: ToolExecutionPlan,temperature) -> AsyncGenerator[Any, Any]:
         """
-        使用LLM生成执行结果的最终总结
+        生成执行结果的最终总结
         """
         tool_history = []
         for tool_name in plan.execution_order:
