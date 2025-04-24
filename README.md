@@ -42,6 +42,14 @@ npm start
 ### 后端启动
 
 ```bash
+# 创建环境
+python -m venv venv
+
+# 激活虚拟环境
+venv\Scripts\activate  # win
+source venv/bin/activate #linux/mac
+  
+
 # 安装Python依赖
 pip install -r requirements.txt
 
