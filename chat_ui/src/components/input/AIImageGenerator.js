@@ -246,13 +246,16 @@ const AIImageGenerator = ({ onClose, onSendRequest, userId }) => {
   const handleSend = () => {
     let messageContent = '';
     let imageFile = null;
-
+  
     if (mainTab === 'generate') {
-      messageContent = `AI生图：${prompt}`;
-
+      // 添加宽高比信息到提示词中
+      const aspectRatioText = aspectRatioOptions.find(ratio => ratio.id === selectedAspectRatio)?.name || '1:1 方形';
+      messageContent = `AI生图：${prompt}，宽高比：${aspectRatioText}`;
+  
       onSendRequest({
         content: messageContent,
-        type: 'text'
+        type: 'text',
+        aspectRatio: selectedAspectRatio
       });
     } else if (mainTab === 'expand' && uploadedImage) {
       if (expandDirection === 'horizontal') {
@@ -262,9 +265,9 @@ const AIImageGenerator = ({ onClose, onSendRequest, userId }) => {
       } else if (expandDirection === 'increase') {
         messageContent = `AI生图：图像扩展，增加尺寸：${customSize}px`;
       }
-
+  
       imageFile = uploadedImage.file;
-
+  
       onSendRequest({
         content: messageContent,
         type: 'image',
@@ -274,9 +277,9 @@ const AIImageGenerator = ({ onClose, onSendRequest, userId }) => {
     } else if (mainTab === 'enhance' && uploadedImage && enhanceOption) {
       const option = enhanceOptions.find(o => o.id === enhanceOption);
       messageContent = `AI生图：提升清晰度，${option ? option.name : ''}`;
-
+  
       imageFile = uploadedImage.file;
-
+  
       onSendRequest({
         content: messageContent,
         type: 'image',
@@ -284,7 +287,7 @@ const AIImageGenerator = ({ onClose, onSendRequest, userId }) => {
         imageUrl: uploadedImage.url
       });
     }
-
+  
     onClose();
   };
 
