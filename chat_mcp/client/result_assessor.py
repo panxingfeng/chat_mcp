@@ -158,6 +158,7 @@ class ResultAssessor:
             "problem_solved": False,
             "final_confidence": 0.0,
             "need_more_tools": True,
+            "tool_failed": False,
             "next_tool_suggestion": ""
         }
 
@@ -178,6 +179,14 @@ class ResultAssessor:
         reason_match = re.search(r'原因分析:\s*([^\n]+)', content)
         if reason_match:
             result["reason"] = reason_match.group(1).strip()
+
+        tool_execution_match = re.search(r'工具执行成败:\s*(成功|失败)', content)
+        if tool_execution_match:
+            result["tool_failed"] = tool_execution_match.group(1) == "失败"
+        else:
+            tool_execution_bracket_match = re.search(r'\(工具执行成败：(True|False)\)', content)
+            if tool_execution_bracket_match:
+                result["tool_failed"] = tool_execution_bracket_match.group(1) == "True"
 
         tools_match = re.search(r'是否需要其他工具:\s*(是|否)', content)
         if tools_match:

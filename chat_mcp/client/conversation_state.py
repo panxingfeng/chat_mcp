@@ -92,9 +92,8 @@ class ConversationExecutor:
 
     async def _determine_execution_mode(self, query: str, tools: List[Dict]) -> ExecutionMode | None:
         """
-        使用AI动态判断最合适的工具执行模式
+        使用llm动态判断最合适的工具执行模式
         """
-        # 准备工具信息
         tool_descriptions = []
         for tool in tools:
             name = tool.get("function", {}).get("name", "")

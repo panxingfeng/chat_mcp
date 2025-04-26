@@ -194,7 +194,7 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
   const parseContentParts = (text) => {
     const parts = [];
 
-    const assessmentPattern = /(?:\[结果评估\]|工具结果评估:)\s*(满足全部|满足|不满足|满足部分)(?:用户需求|执行预期|需求)?\s*\(置信度:\s*([\d.]+)\)(?:\s*原因:\s*([\s\S]+?))?(?=是否需要执行其他工具:|$)/g;
+    const assessmentPattern = /(?:\[结果评估\]|工具结果评估:)\s*(满足全部|满足|不满足|满足部分)(?:用户需求|执行预期|需求)?\s*\(置信度:\s*([\d.]+)\)(?:\s*\(工具执行成败：(True|False)\))?(?:\s*原因:\s*([\s\S]+?))?(?=是否需要执行其他工具:|$)/g;
     const finalDecisionPattern = /(?:已获得满足需求的结果|问题已解决)(?:\(置信度:\s*([\d.]+)\))?[，,]?\s*将生成最终回答/g;
     const toolExecPattern = /执行工具[:：]\s*([^\s,，\n]+)(?:\s|$)/g;
 
@@ -235,13 +235,15 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
         const satisfiesIntent = match[1].includes('满足') && !match[1].includes('部分') && !match[1].includes('不满足');
         const partialSatisfies = match[1] === '满足部分' || match[1] === '部分满足';
         const confidence = parseFloat(match[2]);
-        const reason = match[3] ? match[3].trim() : '';
-
+        const toolExecutionSuccess = match[3] === 'True';
+        const reason = match[4] ? match[4].trim() : '';
+        
         parts.push({
           type: 'tool-assessment',
           satisfiesIntent,
           partialSatisfies,
           confidence,
+          toolExecutionSuccess,
           reason
         });
       } else if (current.type === 'decision') {
@@ -819,24 +821,24 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
               </div>
             </div>
           );
-        } else if (part.type === 'tool-assessment') {
-          return (
-            <div key={`assessment-${index}`} className="tool-assessment-wrapper">
-              <div className={`tool-assessment-content ${part.satisfiesIntent ? 'satisfies' : (part.partialSatisfies ? 'partial' : 'not-satisfies')}`}>
-                <div className="assessment-header">
-                  <div className="assessment-result">
-                    {part.satisfiesIntent ? '满足需求' : (part.partialSatisfies ? '满足部分需求' : '不满足需求')}
-                    {part.confidence && <ConfidenceBadge confidence={part.confidence} />}
-                  </div>
-                </div>
-                {part.reason && (
-                  <div className="assessment-reason">
-                    <strong>原因:</strong> {part.reason}
-                  </div>
-                )}
-              </div>
-            </div>
-          );
+        // } else if (part.type === 'tool-assessment') {
+        //   return (
+        //     <div key={`assessment-${index}`} className="tool-assessment-wrapper">
+        //       <div className={`tool-assessment-content ${part.satisfiesIntent ? 'satisfies' : (part.partialSatisfies ? 'partial' : 'not-satisfies')}`}>
+        //         <div className="assessment-header">
+        //           <div className="assessment-result">
+        //             {part.satisfiesIntent ? '满足需求' : (part.partialSatisfies ? '满足部分需求' : '不满足需求')}
+        //             {part.confidence && <ConfidenceBadge confidence={part.confidence} />}
+        //           </div>
+        //         </div>
+        //         {part.reason && (
+        //           <div className="assessment-reason">
+        //             <strong>原因:</strong> {part.reason}
+        //           </div>
+        //         )}
+        //       </div>
+        //     </div>
+        //   );
         }
         return null;
       })}

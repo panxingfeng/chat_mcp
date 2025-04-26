@@ -30,6 +30,7 @@ ASSESS_PROMPT = """
 工具结果评估: [完全解决/部分解决/未解决]
 参数匹配度: [0.7-1.0]
 原因分析: [简明说明评估依据]
+工具执行成败: [成功/失败]
 是否需要其他工具: [是/否] 
    - 判断依据: 
      1. 若还有需要获取数据的子任务未完成，则需要其他工具（是）
@@ -91,6 +92,7 @@ POST_PROCESSING_PROMPT = """
     "need_more_tools": boolean,
     "problem_solved": boolean,
     "final_confidence": 0.0-1.0,
+    "tool_failed": boolean,
     "confidence": 0.0-1.0,
     "next_tool_suggestion": "建议的下一个工具"
 }}

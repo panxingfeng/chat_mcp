@@ -170,10 +170,9 @@ class ComfyuiServer:
                     
                     wait_for_result = arguments.get("wait_for_result", False)
                     
-                    asyncio.create_task(self.handle_image_generation(task_id, arguments))
+                    task = asyncio.create_task(self.handle_image_generation(task_id, arguments))
                     
                     if not wait_for_result:
-                        # 如果不等待结果，直接返回任务已提交的消息
                         return [TextContent(
                             type="text", 
                             text=f"图像生成任务已提交，任务ID: {task_id}。生成过程需要一些时间，请稍候。"
@@ -203,6 +202,14 @@ class ComfyuiServer:
                     
                     final_status = self.get_task_status(task_id)
                     
+                    if final_status.get("status") in [TaskStatus.FAILED.value, TaskStatus.ERROR.value]:
+                        error_message = final_status.get("message", "图像生成失败")
+                        error = ErrorData(message=error_message, code=-32603)
+                        raise McpError(error)
+                    
+                    if final_status.get("status") == TaskStatus.STOPPED.value:
+                        return [TextContent(type="text", text=f"任务ID: {task_id}\n状态: 已停止\n消息: {final_status.get('message', '任务已被手动停止')}")]
+                    
                     progress_info = ""
                     if final_status.get("status") == TaskStatus.GENERATING.value:
                         progress = final_status.get("progress", 0)
@@ -230,6 +237,10 @@ class ComfyuiServer:
                     status = task_status.get("status")
                     message = task_status.get("message", "无消息")
                     
+                    if status in [TaskStatus.FAILED.value, TaskStatus.ERROR.value]:
+                        error_message = f"图像生成任务 {task_id} {status}: {message}"
+                        error = ErrorData(message=error_message, code=-32603)
+                        raise McpError(error)
 
                     progress_info = ""
                     if status == TaskStatus.GENERATING.value:
@@ -447,13 +458,21 @@ class ComfyuiServer:
                     except Exception as e:
                         logger.error(f"复制图像文件失败: {str(e)}")
                 
-                self.update_task_status(
-                    task_id, 
-                    TaskStatus.COMPLETED, 
-                    "图像生成完成",
-                    static_image_paths=static_img_paths,
-                    image_urls=image_urls
-                )
+                # 检查是否有任何图像URL
+                if not image_urls:
+                    self.update_task_status(
+                        task_id, 
+                        TaskStatus.FAILED, 
+                        "图像生成完成但无有效图像"
+                    )
+                else:
+                    self.update_task_status(
+                        task_id, 
+                        TaskStatus.COMPLETED, 
+                        "图像生成完成",
+                        static_image_paths=static_img_paths,
+                        image_urls=image_urls
+                    )
             else:
                 if not self.is_running(task_id):
                     self.update_task_status(
@@ -465,7 +484,7 @@ class ComfyuiServer:
                     self.update_task_status(
                         task_id, 
                         TaskStatus.FAILED, 
-                        "图像生成失败"
+                        "图像生成失败，未获取到图像路径"
                     )
                     
         except Exception as e:
