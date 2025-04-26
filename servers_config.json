@@ -2,24 +2,23 @@
   "mcpServers": {
     "weather": {
       "command": "python",
-      "args": ["-m", "chat_mcp.mcp_server.mcp_server_weather", "--api-key=72c8539d4ffb291f77276a1e9979243c"]
+      "args": ["-m", "chat_mcp.mcp_server.mcp_server_weather", "--api-key=高德API"]
     },
     "speech": {
       "command": "python",
-      "args": ["-m", "chat_mcp.mcp_server.mcp_server_speech", "--server-url=http://localhost:7860/"]
+      "args": ["-m", "chat_mcp.mcp_server.mcp_server_speech", "--server-url=INDEX-TTS的url信息"]
     },
     "web_search": {
       "command": "python",
-      "args": ["-m", "mcp_server_searxng", "--instance-url=http://localhost:4000"]
+      "args": ["-m", "mcp_server_searxng", "--instance-url=searXNG的url信息"]
     },
     "wechat": {
       "command": "python",
-      "args": ["-m", "mcp_server_wechat","--folder-path=D:\\mcp_wechat聊天记录保存"]
+      "args": ["-m", "mcp_server_wechat","--folder-path=保存历史记录的目录"]
     },
     "comfyui": {
       "command": "python",
-      "args": ["-m", "chat_mcp.mcp_server.mcp_server_comfyui","--server-url=127.0.0.1:8188"]
+      "args": ["-m", "chat_mcp.mcp_server.mcp_server_comfyui","--server-url=COMFYUI的url信息"]
     }
   }
 }
-
