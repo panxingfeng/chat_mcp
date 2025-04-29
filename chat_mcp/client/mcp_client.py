@@ -62,6 +62,52 @@ def extract_json_from_llm_response(content: str) -> Dict[str, Any]:
     logger.warning(f"无法从响应中提取JSON: {content}")
     return {}
 
+async def filter_stream(stream_generator):
+    in_think_block = False
+    buffer = ""
+    think_detected = False
+    
+    async for chunk in stream_generator:
+        if hasattr(chunk, 'choices') and chunk.choices:
+            if hasattr(chunk.choices[0], 'delta') and hasattr(chunk.choices[0].delta, 'content'):
+                chunk_text = chunk.choices[0].delta.content or ""
+            else:
+                chunk_text = ""
+        else:
+            try:
+                chunk_text = str(chunk)
+            except:
+                chunk_text = ""
+        
+        buffer += chunk_text
+        
+        if "<think>" in buffer and not in_think_block:
+            think_detected = True
+            in_think_block = True
+            buffer = ""
+            continue
+        
+        if "</think>" in buffer and in_think_block:
+            post_think_content = buffer.split("</think>", 1)[1]
+            buffer = post_think_content
+            in_think_block = False
+            
+            if buffer:
+                yield buffer
+                buffer = ""
+            continue
+            
+        if not in_think_block and not think_detected:
+            yield chunk_text
+            buffer = ""
+        
+        if in_think_block:
+            continue
+            
+        if not in_think_block and think_detected and buffer:
+            yield buffer
+            buffer = ""
+
 class ExecutionStep:
     def __init__(self, 
                  step_id: str, 
@@ -244,7 +290,7 @@ class ExecutionPlan:
         return cls.from_dict(data)
     
     def get_todo_list(self) -> str:
-        """生成待办事项列表"""
+        """生成可读的待办事项列表"""
         todo = []
         todo.append(f"# 执行计划: {self.user_query}")
         todo.append(f"# 创建时间: {self.creation_time}")
@@ -462,7 +508,7 @@ class MCPClient:
                     temperature=temperature
                 )
                 async for chunk in stream_generator:
-                    yield chunk
+                        yield chunk
 
         except Exception as e:
             error_msg = f"处理查询出错: {str(e)}"
@@ -509,6 +555,13 @@ class MCPClient:
             )
             
             content = response.choices[0].message.content.strip().lower()
+            print("content:",content)
+
+            think_pattern = re.compile(r'</think>(.*)', re.DOTALL)
+            match = think_pattern.search(content)
+            if match:
+                content = match.group(1).strip()
+
             if "需要" in content:
                 logger.info(f"LLM判断问题'{user_query}'需要工具调用")
                 return True
@@ -561,7 +614,11 @@ class MCPClient:
             )
             
             content = response.choices[0].message.content
-            
+            think_pattern = re.compile(r'</think>(.*)', re.DOTALL)
+            match = think_pattern.search(content)
+            if match:
+                content = match.group(1).strip()
+
             selected_tools = extract_json_from_llm_response(content)
             if not selected_tools or not isinstance(selected_tools, list):
                 logger.warning(f"无法解析筛选工具结果，使用所有工具: {content}")
@@ -689,6 +746,11 @@ class MCPClient:
             )
             
             content = response.choices[0].message.content
+            think_pattern = re.compile(r'</think>(.*)', re.DOTALL)
+            match = think_pattern.search(content)
+            if match:
+                content = match.group(1).strip()
+
             logger.info(f"执行计划LLM响应: {content}")
             
             plan_data = extract_json_from_llm_response(content)
@@ -1127,7 +1189,7 @@ class MCPClient:
             temperature=temperature
         )
 
-        async for chunk in stream_generator:
+        async for chunk in filter_stream(stream_generator):
             yield chunk
     
     async def _execute_step(self, step: ExecutionStep, execution_results: Dict[str, Any],history_message: str) -> Tuple[bool, Any, str]:

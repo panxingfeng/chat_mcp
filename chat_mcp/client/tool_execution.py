@@ -27,9 +27,7 @@ class ToolExecutor:
                     message=f"无效的工具对象"
                 )
 
-            # 检查工具对象结构，支持不同格式的工具对象
             if "server" in tool:
-                # 从 tool_manager.py 获取的工具格式
                 if "session" not in tool["server"]:
                     raise ToolExecutionError(
                         tool_name=tool_name,
@@ -58,7 +56,6 @@ class ToolExecutor:
                             is_recoverable=False
                         )
             elif "execute" in tool:
-                # 直接包含execute方法的工具格式
                 async with asyncio.timeout(self.tool_execution_timeout):
                     try:
                         result = await tool["execute"](tool_args)
@@ -74,7 +71,6 @@ class ToolExecutor:
                             is_recoverable=False
                         )
             elif "function" in tool:
-                # 处理从工具选择器获取的工具格式
                 if "server" in tool and "session" in tool["server"]:
                     async with asyncio.timeout(self.tool_execution_timeout):
                         try:
@@ -103,7 +99,6 @@ class ToolExecutor:
                         message="工具对象缺少server字段或会话对象"
                     )
             else:
-                # 无法识别的工具格式
                 raise ToolExecutionError(
                     tool_name=tool_name,
                     message="不支持的工具格式，缺少execute方法或server字段"
@@ -118,7 +113,6 @@ class ToolExecutor:
                 is_recoverable=True
             )
         except ToolExecutionError:
-            # 重新抛出已经格式化的工具执行错误
             raise
         except Exception as e:
             logging.error(f"执行工具 {tool_name} 时出错: {str(e)}", exc_info=True)

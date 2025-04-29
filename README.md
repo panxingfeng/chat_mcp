@@ -11,7 +11,7 @@ chat_mcp是一个聊天服务和工具执行平台，允许用户通过聊天界
 - **LM Studio**
 - **Gemini**
 
-> PS: 目前不支持推理模型,历史记录保存只支持在Microsoft Edge使用，谷歌不适用
+> PS: 历史记录保存只支持在Microsoft Edge使用，谷歌不适用
 
 ## 快速开始
 

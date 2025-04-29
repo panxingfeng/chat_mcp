@@ -24,18 +24,13 @@ class ResultAssessor:
             all_previous_results: List[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         """评估单个工具的执行结果"""
-        # 构建评估提示
         prompt = self._build_assessment_prompt(
             user_query, tool_name, tool_args, result, all_previous_results
         )
         
-        # 获取LLM评估
         response = await self._get_llm_response(prompt, temperature=0.3)
-        
-        # 解析评估结果
         assessment = self._extract_json_from_response(response)
-        
-        # 如果解析失败，构建默认评估
+
         if not assessment:
             assessment = self._get_default_assessment("解析评估结果失败")
             
@@ -57,13 +52,11 @@ class ResultAssessor:
                 "need_more_tools": False
             }
 
-        # 构建工具执行上下文
         tools_context = ""
         for i, result in enumerate(all_tool_results):
             tools_context += f"\n工具 {i + 1}: {result.get('tool_name', '')}\n"
             tools_context += f"结果: {result.get('result', '')}\n\n"
 
-        # 构建最终评估提示
         prompt = f"""综合评估所有工具执行结果，判断用户问题是否已得到解决：
 
 用户问题:
@@ -107,9 +100,7 @@ class ResultAssessor:
                     "need_more_tools": False
                 }
                 
-            # 检查异步任务特征
             if not assessment.get("problem_solved", False) and not assessment.get("need_more_tools", False):
-                # 检查最后一个结果是否包含异步任务特征
                 if all_tool_results:
                     last_result = all_tool_results[-1].get("result", "")
                     async_keywords = ["任务ID", "进度", "生成中", "处理中", "等待", "排队中"]
@@ -139,13 +130,19 @@ class ResultAssessor:
         ]
 
         try:
-            # 移除await，直接调用
             response = self.llm_client.chat.completions.create(
                 model=self.model,
                 messages=messages,
                 temperature=temperature
             )
-            return response.choices[0].message.content
+
+            content = response.choices[0].message.content
+            think_pattern = re.compile(r'</think>(.*)', re.DOTALL)
+            match = think_pattern.search(content)
+            if match:
+                content = match.group(1).strip()
+            return content
+        
         except Exception as e:
             logger.error(f"LLM调用失败: {str(e)}")
             return ""
@@ -158,7 +155,6 @@ class ResultAssessor:
         try:
             return json.loads(response)
         except json.JSONDecodeError:
-            # 尝试使用正则表达式提取JSON
             json_match = re.search(r'\{.*\}', response, re.DOTALL)
             if json_match:
                 try:
@@ -181,7 +177,6 @@ class ResultAssessor:
         """构建评估提示词"""
         has_error = "isError=True" in result or "执行出错" in result
         
-        # 构建工具执行上下文
         previous_context = "无"
         if all_previous_results:
             context_lines = []
