@@ -15,16 +15,6 @@
     "wechat": {
       "command": "python",
       "args": ["-m", "mcp_server_wechat","--folder-path=保存历史记录的目录"]
-<<<<<<< HEAD
     }
   }
 }
-=======
-    },
-    "comfyui": {
-      "command": "python",
-      "args": ["-m", "chat_mcp.mcp_server.mcp_server_comfyui","--server-url=COMFYUI的url信息"]
-    }
-  }
-}
->>>>>>> e5c17deee4805d9d95832cb4ba3ea248720cb130
