@@ -5,7 +5,7 @@
   max-width: 600px;
 }
 
-/* 基本网格布局 - 默认一行4张 */
+
 .image-gallery {
   display: grid !important;
   grid-template-columns: repeat(4, 1fr) !important;
@@ -14,12 +14,12 @@
   align-items: start !important;
 }
 
-/* 四张图布局 */
+
 .image-gallery.four-images {
   grid-template-columns: repeat(4, 1fr);
 }
 
-/* 六张图布局 */
+
 .image-gallery.six-images {
   grid-template-areas: 
     "img1 img2 img3 img4"
@@ -33,7 +33,7 @@
 .image-gallery.six-images .gallery-image-wrapper:nth-child(5) { grid-area: img5; }
 .image-gallery.six-images .gallery-image-wrapper:nth-child(6) { grid-area: img6; }
 
-/* 自定义滚动条样式 */
+
 .image-gallery::-webkit-scrollbar {
   height: 4px;
 }
@@ -52,7 +52,7 @@
   background: #555;
 }
 
-/* 强制图片容器使用自然高度而非固定比例 */
+
 .gallery-image-wrapper {
   width: 100% !important;
   position: relative !important;
@@ -60,7 +60,6 @@
   overflow: hidden !important;
   border-radius: 8px !important;
   transition: transform 0.2s ease !important;
-  /* 关键是移除aspect-ratio并设置其他属性 */
   aspect-ratio: unset !important;
   height: auto !important;
   min-height: 50px !important;
@@ -71,7 +70,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 单图容器样式 */
 .single-image-container {
   position: relative;
   margin: 10px 0;
@@ -80,7 +78,6 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 强制图片保持原始比例 */
 .gallery-image {
   width: 100% !important;
   height: auto !important;
@@ -90,7 +87,7 @@
   transition: filter 0.3s ease !important;
 }
 
-/* 图片操作按钮容器 */
+
 .image-actions {
   position: absolute;
   bottom: 0;
@@ -131,7 +128,6 @@
   font-size: 16px;
 }
 
-/* 图片容器内部的图片包装器 */
 .image-with-actions {
   position: relative;
   display: inline-block;
@@ -141,7 +137,7 @@
   border-radius: 8px;
 }
 
-/* 图片加载错误样式 */
+
 .image-error {
   width: 100%;
   min-height: 100px;
@@ -175,7 +171,7 @@
   white-space: nowrap;
 }
 
-/* 图片预览模态框 - 修复闪烁问题 */
+
 .image-preview-modal {
   position: fixed;
   top: 0;
@@ -242,7 +238,7 @@
   background: rgba(0, 0, 0, 0.6);
 }
 
-/* 增强操作按钮样式 */
+
 .preview-actions {
   margin-top: 15px;
   display: flex;
@@ -267,7 +263,7 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* 编辑面板样式 */
+
 .edit-panel {
   position: fixed;
   top: 50%;
@@ -394,13 +390,10 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* 响应式布局调整 */
-/* 大屏幕 (1200px以上) - 默认一行4张，已在上面定义 */
 
-/* 中等屏幕 (769px-1200px) - 一行3张 */
 @media (max-width: 1200px) and (min-width: 769px) {
   .image-gallery {
-    grid-template-columns: repeat(3, 1fr) !important; /* 中等屏幕调整为3列 */
+    grid-template-columns: repeat(3, 1fr) !important; 
   }
   
   .image-gallery.six-images {
@@ -410,13 +403,11 @@
   }
 }
 
-/* 平板设备 (481px-768px) - 一行2-3张 */
 @media (max-width: 768px) and (min-width: 481px) {
   .image-gallery {
-    grid-template-columns: repeat(2, 1fr) !important; /* 平板设备调整为2列 */
+    grid-template-columns: repeat(2, 1fr) !important; 
   }
-  
-  /* 针对特定数量图片的响应式布局 */
+
   .image-gallery.four-images {
     grid-template-columns: repeat(2, 1fr) !important;
   }
@@ -447,14 +438,13 @@
   }
 }
 
-/* 手机设备 (480px以下) - 一行2张 */
+
 @media (max-width: 480px) {
   .image-gallery {
-    grid-template-columns: repeat(2, 1fr) !important; /* 手机设备调整为2列 */
-    gap: 6px !important; /* 减少间距以适应小屏幕 */
+    grid-template-columns: repeat(2, 1fr) !important; 
+    gap: 6px !important; 
   }
   
-  /* 针对特定数量图片的响应式布局 */
   .image-gallery.four-images {
     grid-template-columns: repeat(2, 1fr) !important;
   }
@@ -527,7 +517,7 @@
   z-index: 9999;
 }
 
-/* 空画廊样式 */
+
 .empty-gallery {
   width: 100%;
   height: 150px;
@@ -541,7 +531,7 @@
   font-size: 14px;
 }
 
-/* 结构化内容样式 */
+
 .structured-content-container {
   width: 100%;
   margin: 0 auto;
@@ -577,7 +567,7 @@
   text-align: center;
 }
 
-/* 图像加载中的容器 */
+
 .image-loading {
   width: 100%;
   height: 100%;
@@ -590,7 +580,6 @@
   border-radius: 4px;
 }
 
-/* 加载动画 */
 .spinner {
   width: 32px;
   height: 32px;
@@ -607,13 +596,12 @@
   }
 }
 
-/* 处理中文本 */
+
 .image-loading span {
   font-size: 12px;
   color: #666;
 }
 
-/* 处理中标签 */
 .processing-badge {
   font-size: 11px;
   background-color: #f39c12;

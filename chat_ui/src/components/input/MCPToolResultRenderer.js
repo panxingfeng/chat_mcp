@@ -2,15 +2,9 @@ import React from 'react';
 import './MCPToolResultRenderer.css';
 import MarkdownRenderer, {isMarkdownContent} from "./isMarkdownContent";
 
-/**
- * 解析MCP响应文本内容
- * @param {string} responseText MCP响应文本
- * @returns {string} 提取的纯文本内容
- */
 export function extractTextContent(responseText) {
   if (!responseText) return '';
 
-  // 处理特定格式 meta=None content=TextContent(...)
   const metaContentMatch = responseText.match(/meta=None\s+content=TextContent\(type='text',\s+text='([\s\S]+?)(?:',\s+annotations=None\)|'\))/);
   if (metaContentMatch && metaContentMatch[1]) {
     return metaContentMatch[1]
@@ -19,7 +13,6 @@ export function extractTextContent(responseText) {
       .replace(/\\"/g, '"');
   }
 
-  // 处理content=[TextContent(...)]格式
   const contentMatch = responseText.match(/content=\[TextContent\(type='text',\s+text='([\s\S]+?)(?:',\s+annotations=None\)|'\))\]/);
   if (contentMatch && contentMatch[1]) {
     return contentMatch[1]
@@ -28,7 +21,6 @@ export function extractTextContent(responseText) {
       .replace(/\\"/g, '"');
   }
 
-  // 处理仅包含TextContent(...)的格式
   const simpleMatch = responseText.match(/TextContent\(type='text',\s+text='([\s\S]+?)(?:',\s+annotations=None\)|'\))/);
   if (simpleMatch && simpleMatch[1]) {
     return simpleMatch[1]
@@ -37,31 +29,24 @@ export function extractTextContent(responseText) {
       .replace(/\\"/g, '"');
   }
 
-  // 如果上述格式都不匹配，返回原始文本
   return responseText;
 }
 
-/**
- * 检测并识别内容类型
- * @param {string} content 要检测的内容
- * @returns {string} 内容类型
- */
+
+
 export function detectContentType(content) {
   const text = extractTextContent(content);
 
-  // 首先检测是否为Markdown格式文档
   if (isMarkdownContent(text)) {
     return 'markdown';
   }
 
-  // 检测URL链接
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   if (text.match(urlRegex)) {
-    // 提取URL以便检查
-    const urls = text.match(urlRegex) || [];
-    const url = urls[0];  // 使用第一个URL进行检测
 
-    // 网页URL特殊检测 - 新增的网页检测逻辑
+    const urls = text.match(urlRegex) || [];
+    const url = urls[0];
+
     if (url.includes('.html') ||
       url.includes('www.') ||
       url.includes('/web/') ||
@@ -70,10 +55,10 @@ export function detectContentType(content) {
       text.toLowerCase().includes('网站') ||
       text.toLowerCase().includes('webpage') ||
       text.toLowerCase().includes('website')) {
-      return 'url-sandbox';  // 改为 url-sandbox
+      return 'url-sandbox';
     }
 
-    // 音乐URL特殊检测
+
     if (url.match(/\.(mp3|wav|ogg|flac|m4a|aac)(\?|$)/i) ||
         text.toLowerCase().includes('音乐') ||
         text.toLowerCase().includes('歌曲') ||
@@ -84,7 +69,7 @@ export function detectContentType(content) {
       return 'url-audio';
     }
 
-    // 图片URL特殊检测
+
     if (url.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i) ||
         text.toLowerCase().includes('图片') ||
         text.toLowerCase().includes('照片') ||
@@ -93,7 +78,7 @@ export function detectContentType(content) {
       return 'url-image';
     }
 
-    // 视频URL特殊检测 - 修改为更严格的检测条件
+
     if ((url.match(/\.(mp4|webm|mov|avi|mkv)(\?|$)/i)) ||
         ((text.toLowerCase().includes('视频') ||
           text.toLowerCase().includes('影片') ||
@@ -102,7 +87,6 @@ export function detectContentType(content) {
       return 'url-video';
     }
 
-    // 文件URL特殊检测
     if (url.match(/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|txt|csv)(\?|$)/i) ||
         text.toLowerCase().includes('文件') ||
         text.toLowerCase().includes('下载') ||
@@ -111,60 +95,49 @@ export function detectContentType(content) {
       return 'url-file';
     }
 
-    // 通用URL检测
     return 'url-link';
   }
 
-  // 天气信息检测
   if (text.includes('🌤') && text.includes('天气:') && text.includes('温度:')) {
     return 'weather';
   }
 
-  // 微信消息历史记录检测
   if (text.includes('获取到') && text.includes('条与') && text.includes('聊天记录') &&
       text.includes('发送者:') && text.includes('时间:') && text.includes('消息:')) {
     return 'chat-history';
   }
 
-  // 搜索结果检测
   if (text.match(/\[\d+\]/g) &&
       (text.includes('days ago') || text.includes('小时前') || text.includes('天前')) &&
       text.includes('MCP')) {
     return 'search-results';
   }
 
-  // 消息发送成功结果检测
   if ((text.includes('"status": "success"') || text.includes("'status': 'success'")) &&
       text.includes('message') &&
       (text.includes('发送') || text.includes('消息'))) {
     return 'message-sent';
   }
 
-  // 如果没有匹配到特定类型，则返回通用类型
   return 'generic';
 }
 
-/**
- * 天气信息渲染器 - 支持多城市显示
- * @param {string} content 天气信息内容
- */
+
+
+
 export function WeatherRenderer({ content }) {
   const text = extractTextContent(content);
   
-  // 检查是否是多城市查询结果
   const isMultiCity = text.includes('多城市天气查询结果') || text.includes('(共') || text.includes('个城市)');
   
   if (isMultiCity) {
-    // 解析多城市天气数据
     const headerMatch = text.match(/📊 多城市天气查询结果 \(共(\d+)个城市\)/);
     const totalCities = headerMatch ? parseInt(headerMatch[1]) : 0;
     
-    // 分割每个城市的天气信息
     const cityWeatherBlocks = text.split('------------------------------')
       .filter(block => block.includes('天气信息') && block.includes('📍 位置:'))
       .map(block => block.trim());
     
-    // 解析每个城市的天气数据
     const weatherData = cityWeatherBlocks.map(block => {
       const lines = block.split('\n');
       return {
@@ -200,7 +173,6 @@ export function WeatherRenderer({ content }) {
       </div>
     );
   } else {
-    // 单城市天气显示逻辑（保持原样）
     const lines = text.split('\n');
     const data = {
       location: lines.find(line => line.includes('📍'))?.replace('📍 位置:', '').trim() || '',
@@ -216,14 +188,12 @@ export function WeatherRenderer({ content }) {
   }
 }
 
-/**
- * 单个天气卡片组件
- * @param {Object} data 天气数据
- */
+
+
+
 function WeatherCard({ data }) {
   const { location, weather, temperature, windDirection, windForce, humidity, publishTime } = data;
   
-  // 根据天气状况选择背景色
   let bgClass = 'weather-sunny';
   if (weather.includes('雨')) {
     bgClass = 'weather-rainy';
@@ -275,13 +245,11 @@ function WeatherCard({ data }) {
   );
 }
 
-/**
- * 搜索结果渲染器
- * @param {string} content 搜索结果内容
- */
+
+
+
 export function SearchResultsRenderer({ content }) {
   const text = extractTextContent(content);
-  // 分割每条搜索结果
   const resultPattern = /\[(\d+)\](.*?)(?=\[\d+\]|$)/gs;
   const matches = [...text.matchAll(resultPattern)];
 
@@ -289,7 +257,6 @@ export function SearchResultsRenderer({ content }) {
     const index = match[1];
     const resultText = match[2].trim();
 
-    // 尝试提取更多详细信息
     const timeMatch = resultText.match(/(\d+)\s*(days?|天前|hours?|小时前)/);
     const time = timeMatch ? timeMatch[0] : '';
 
@@ -324,21 +291,18 @@ export function SearchResultsRenderer({ content }) {
   );
 }
 
-/**
- * 微信聊天历史记录渲染器
- * @param {string} content 聊天历史记录内容
- */
+
+
+
 export function ChatHistoryRenderer({ content }) {
   const text = extractTextContent(content);
   const lines = text.split('\n');
 
-  // 提取标题信息
   const titleLine = lines[0];
   const messagesCount = titleLine.match(/获取到\s*(\d+)\s*条/)?.[1] || '0';
   const chatWith = titleLine.match(/与\s*(.+?)\s*在/)?.[1] || '';
   const chatDate = titleLine.match(/在\s*(.+?)\s*的/)?.[1] || '';
 
-  // 分割消息
   const messages = [];
   let currentMessage = null;
 
@@ -365,12 +329,10 @@ export function ChatHistoryRenderer({ content }) {
         currentMessage = null;
       }
     } else if (currentMessage && currentMessage.message) {
-      // 为多行消息添加内容
       currentMessage.message += '\n' + line;
     }
   }
 
-  // 添加最后一条消息
   if (currentMessage) {
     messages.push(currentMessage);
   }
@@ -410,17 +372,14 @@ export function ChatHistoryRenderer({ content }) {
   );
 }
 
-/**
- * 消息发送结果渲染器
- * @param {string} content 消息发送结果内容
- */
+
+
+
 export function MessageSentRenderer({ content }) {
   const text = extractTextContent(content);
-
-  // 尝试解析 JSON
+  
   let jsonData = null;
   try {
-    // 寻找 JSON 格式的文本
     const jsonMatch = text.match(/({[\s\S]*})/);
     if (jsonMatch) {
       jsonData = JSON.parse(jsonMatch[1]);
@@ -429,12 +388,10 @@ export function MessageSentRenderer({ content }) {
     console.warn('无法解析消息发送结果为JSON:', e);
   }
 
-  // 提取消息和状态
   const status = jsonData?.status ||
     (text.includes('success') ? 'success' : 'unknown');
   const message = jsonData?.message || text;
 
-  // 提取接收者信息
   let recipient = '';
   if (message.includes('发送给')) {
     recipient = message.match(/发送给\s*(.+?)($|\s|,|，)/)?.[1] || '';
@@ -442,7 +399,6 @@ export function MessageSentRenderer({ content }) {
     recipient = message.match(/向\s*(.+?)\s*发送/)?.[1] || '';
   }
 
-  // 提取消息数量
   const messageCount = message.match(/(\d+)\s*条消息/)?.[1] || '1';
 
   return (
@@ -489,14 +445,13 @@ export function MessageSentRenderer({ content }) {
   );
 }
 
-/**
- * 沙箱网页渲染器 - 在安全的iframe中渲染网页
- * @param {string} content 包含URL的内容文本
- */
+
+
+
+
 export function SandboxRenderer({ content }) {
   const text = extractTextContent(content);
   
-  // 提取URL
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   const urls = text.match(urlRegex) || [];
   
@@ -504,10 +459,8 @@ export function SandboxRenderer({ content }) {
     return <GenericRenderer content={content} />;
   }
   
-  // 获取第一个URL
   const url = urls[0];
   
-  // 提取标题
   let title = '';
   const titleMatch = text.match(new RegExp(`([^\\n.]+)\\s*${escapeRegExp(url)}`));
   if (titleMatch) {
@@ -516,7 +469,6 @@ export function SandboxRenderer({ content }) {
     title = '网页预览';
   }
   
-  // 沙箱属性
   const sandboxAttributes = [
     'allow-same-origin',
     'allow-scripts',
@@ -570,14 +522,12 @@ export function SandboxRenderer({ content }) {
   );
 }
 
-/**
- * URL信息渲染器 - 检测URL类型并提供相应的渲染方式
- * @param {string} content 包含URL的内容文本
- */
+
+
+
 export function UrlInfoRenderer({ content }) {
   const text = extractTextContent(content);
 
-  // 提取URL
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   const urls = text.match(urlRegex) || [];
 
@@ -585,18 +535,15 @@ export function UrlInfoRenderer({ content }) {
     return <GenericRenderer content={content} />;
   }
 
-  // 识别URL类型并存储信息
   const urlInfos = urls.map(url => {
-    let type = 'link'; // 默认类型
+    let type = 'link'; 
     let title = '';
 
-    // 从文本中提取可能的标题信息
     const titleMatch = text.match(new RegExp(`([^\\n.]+)\\s*${escapeRegExp(url)}`));
     if (titleMatch) {
       title = titleMatch[1].trim();
     }
 
-    // 网页URL检测 - 新增
     if (url.includes('.html') ||
         url.includes('www.') ||
         url.includes('/web/') ||
@@ -607,23 +554,18 @@ export function UrlInfoRenderer({ content }) {
         text.toLowerCase().includes('website')) {
       type = 'url-sandbox';
     }
-    // 音频检测
     else if (/\.(mp3|wav|ogg|flac|m4a|aac)(\?|$)/i.test(url)) {
       type = 'audio';
     }
-    // 图片检测
     else if (/\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(url)) {
       type = 'image';
     }
-    // 视频检测 - 更严格的条件
     else if (/\.(mp4|webm|mov|avi|mkv)(\?|$)/i.test(url)) {
       type = 'video';
     }
-    // 文档检测
     else if (/\.(pdf|doc|docx|xls|xlsx|ppt|pptx|txt|csv)(\?|$)/i.test(url)) {
       type = 'file';
     }
-    // 基于内容的推断 - 降低优先级
     else if (url.includes('music') || url.includes('song') || url.includes('audio') ||
              text.toLowerCase().includes('音乐') || text.toLowerCase().includes('歌曲') ||
              text.toLowerCase().includes('音频')) {
@@ -640,19 +582,16 @@ export function UrlInfoRenderer({ content }) {
       type = 'file';
     }
 
-    // 如果没有从文本中提取到标题，尝试从URL中提取一个简单标题
     if (!title) {
       const urlParts = url.split('/');
       const lastPart = urlParts[urlParts.length - 1].split('?')[0];
 
       if (lastPart) {
-        // 尝试转换为更易读的格式
         title = lastPart
           .replace(/[-_+]/g, ' ')
-          .replace(/\.[^.]+$/, '') // 移除文件扩展名
+          .replace(/\.[^.]+$/, '')
           .trim();
 
-        // 将首字母大写
         if (title.length > 0) {
           title = title.charAt(0).toUpperCase() + title.slice(1);
         }
@@ -741,10 +680,6 @@ export function UrlInfoRenderer({ content }) {
                   </div>
                 )}
               </div>
-
-              {/*<div className="url-item-link">*/}
-              {/*  <a href={info.url} target="_blank" rel="noopener noreferrer" className="url-text">{info.url}</a>*/}
-              {/*</div>*/}
             </div>
           </div>
         ))}
@@ -753,15 +688,14 @@ export function UrlInfoRenderer({ content }) {
   );
 }
 
-// 辅助函数：转义正则表达式中的特殊字符
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/**
- * 通用内容渲染器
- * @param {string} content 任意内容
- */
+
+
+
+
 export function GenericRenderer({ content }) {
   const text = extractTextContent(content);
 
@@ -772,18 +706,16 @@ export function GenericRenderer({ content }) {
   );
 }
 
-/**
- * 智能内容渲染器 - 根据内容类型自动选择合适的渲染器
- * @param {string} content 要渲染的内容
- */
+
+
+
+
 export function SmartContentRenderer({ content }) {
   const contentType = detectContentType(content);
 
   switch (contentType) {
     case 'markdown':
-      // 首先提取文本内容
       const markdownContent = extractTextContent(content);
-      // 然后渲染提取的内容
       return <MarkdownRenderer content={markdownContent} />;
     case 'weather':
       return <WeatherRenderer content={content} />;
@@ -795,7 +727,6 @@ export function SmartContentRenderer({ content }) {
       return <MessageSentRenderer content={content} />;
     case 'url-sandbox':
       return <SandboxRenderer content={content} />;
-    // URL相关类型
     case 'url-audio':
     case 'url-image':
     case 'url-video':

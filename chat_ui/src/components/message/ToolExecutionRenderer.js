@@ -20,6 +20,7 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
   });
 
   const [renderKey, setRenderKey] = useState(0);
+  const [executingTools, setExecutingTools] = useState({});
   const isMountedRef = useRef(false);
   const isScrollingRef = useRef(false);
   const scrollTimeoutRef = useRef(null);
@@ -30,7 +31,7 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
   }, []);
 
   const getCollapsedState = useCallback((resultId) => {
-    return collapsedStatesCache[resultId] || false;
+    return collapsedStatesCache[resultId] !== undefined ? collapsedStatesCache[resultId] : true;
   }, []);
 
   const setCollapsedState = useCallback((resultId, isCollapsed) => {
@@ -170,10 +171,270 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
       .replace(/\bnull\b/g, '<span class="json-null">null</span>');
   };
 
+  // 过滤掉特定提示语
+  const filterPromptText = (text) => {
+    if (!text || typeof text !== 'string') return text;
+
+    // 过滤掉"问题已完全解决，将生成"等提示语
+    return text.replace(/问题已完全解决，将生成.*?(?=\n|$)/g, '')
+               .trim();
+  };
+
+  // 检测是否为执行计划格式
+  const isExecutionPlan = (text) => {
+      if (!text || typeof text !== 'string') return false;
+      
+      // 同时支持两种格式的标题
+      const hasPlanTitle = text.includes("**执行计划:") || text.includes("执行计划:");
+      
+      // 同时支持中文方括号和英文方括号
+      const hasStepPattern = /\d+\.\s*(?:\[|【)(□|✓|✗)(?:\]|】)/.test(text);
+      
+      return hasPlanTitle && hasStepPattern;
+  };
+
+  // 解析执行计划数据
+  const parseExecutionPlan = (content) => {
+    if (!content || typeof content !== 'string') return null;
+  
+    // 提取计划标题和创建时间
+    const planTitleMatch = content.match(/\*\*执行计划:\s*(.*?)\*\*/);
+    const planTitle = planTitleMatch ? planTitleMatch[1].trim() : "执行计划";
+    
+    const createTimeMatch = content.match(/\*\*创建时间:\s*(.*?)\*\*/);
+    const createTime = createTimeMatch ? createTimeMatch[1].trim() : "";
+    
+    // 查找所有步骤
+    const stepRegex = /(\d+)\.\s*\[(□|✓|✗)\]\s*(.*?)\s*\(ID:\s*(.*?)\)\s*工具:\s*(.*?)\s*参数:\s*(\{.*?\})/g;
+    const steps = [];
+    let match;
+    
+    while ((match = stepRegex.exec(content)) !== null) {
+      steps.push({
+        number: match[1],
+        status: match[2],
+        description: match[3].trim(),
+        id: match[4].trim(),
+        tool: match[5].trim(),
+        params: match[6].trim()
+      });
+    }
+    
+    // 查找所有执行结果
+    const executionResults = [];
+    const executionRegex = /执行步骤\s+(.*?)\s+\((.*?)\)\s+:\s+(成功|失败)\s+结果:\s+(.*?)(?=执行步骤|$)/gs;
+  
+    const finalOutputMatch = content.match(/最终结果[:：]\s*([\s\S]+?)$/);
+    const finalOutput = finalOutputMatch ? finalOutputMatch[1].trim() : "";
+
+    while ((match = executionRegex.exec(content)) !== null) {
+      const stepId = match[1].trim();
+      const toolName = match[2].trim();
+      const status = match[3].trim();
+      const resultContent = match[4].trim();
+      
+      // 解析元数据和内容
+      const metaContentMatch = resultContent.match(/meta=(None|null)\s+content=\[([\s\S]*?)\]\s+isError=(False|True)/s);
+      let resultText = resultContent;
+      let isError = false;
+      
+      if (metaContentMatch) {
+        const textContentMatch = metaContentMatch[2].match(/TextContent\(type='text',\s*text='([\s\S]*?)'/);
+        if (textContentMatch) {
+          resultText = textContentMatch[1]
+            .replace(/\\n/g, '\n')
+            .replace(/\\'/g, "'")
+            .replace(/\\"/g, '"')
+            .replace(/\\\\/g, '\\');
+        }
+        isError = metaContentMatch[3] === 'True';
+      }
+      
+      // 提取评估信息
+      const assessmentMatch = resultContent.match(/评估:\s+满足度:\s+(.*?)\s+\(置信度:\s+(.*?)\)\s+原因:\s+(.*?)(?=执行步骤|$)/s);
+      let assessment = null;
+      
+      if (assessmentMatch) {
+        assessment = {
+          satisfaction: assessmentMatch[1].trim(),
+          confidence: assessmentMatch[2].trim(),
+          reason: assessmentMatch[3].trim()
+        };
+  
+        if (assessment.reason && finalOutput && assessment.reason.includes(finalOutput)) {
+          assessment.reason = assessment.reason.replace("最终结果:" + finalOutput, '').trim();
+        }
+      }
+  
+      executionResults.push({
+        stepId,
+        toolName,
+        status,
+        content: resultText,
+        isError,
+        assessment
+      });
+    }
+    
+    return {
+      title: planTitle,
+      createTime,
+      steps,
+      executionResults,
+      finalOutput 
+    };
+  };
+  
+  // 渲染执行计划界面
+  const renderExecutionPlan = (planData) => {
+    return (
+      <div className="execution-plan">
+        <div className="execution-plan-header">
+          <h3 className="execution-plan-title">{planData.title}</h3>
+          {planData.createTime && <div className="execution-plan-time">{planData.createTime}</div>}
+        </div>
+        
+        <div className="execution-plan-steps">
+          {planData.steps.map((step, index) => {
+            const result = planData.executionResults.find(r => r.stepId === step.id);
+            const resultId = `step-${step.id}`;
+            const isCollapsed = getCollapsedState(resultId);
+            
+            let statusIcon;
+            let statusClass;
+            
+            if (result) {
+              if (result.status === '成功') {
+                statusIcon = (
+                  <svg className="ep-icon success-icon" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                  </svg>
+                );
+                statusClass = 'success';
+              } else {
+                statusIcon = (
+                  <svg className="ep-icon error-icon" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                  </svg>
+                );
+                statusClass = 'error';
+              }
+            } else {
+              statusIcon = (
+                <svg className="ep-icon pending-icon" viewBox="0 0 24 24">
+                  <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z" />
+                </svg>
+              );
+              statusClass = 'pending';
+            }
+            
+            return (
+              <div key={resultId} className={`execution-step ${statusClass}`}>
+                <div 
+                  className="execution-step-header"
+                  onClick={(e) => toggleCollapse(resultId, e)}
+                >
+                  <div className="execution-step-status">{statusIcon}</div>
+                  <div className="execution-step-info">
+                    <div className="execution-step-title">{step.number}. {step.description}</div>
+                    <div className="execution-step-tool">工具: {step.tool}</div>
+                  </div>
+                  <div className="execution-step-toggle">
+                    <svg className={`toggle-icon ${isCollapsed ? '' : 'expanded'}`} viewBox="0 0 24 24">
+                      <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" />
+                    </svg>
+                  </div>
+                </div>
+                
+                {!isCollapsed && (
+                  <div className="execution-step-details">
+                    <div className="execution-params">
+                      <div className="execution-section-title">参数:</div>
+                      <pre className="execution-code">
+                        <code 
+                          className="language-json"
+                          dangerouslySetInnerHTML={{ 
+                            __html: syntaxHighlightJson(formatJsonString(step.params)) 
+                          }}
+                        />
+                      </pre>
+                    </div>
+                    
+                    {result && (
+                      <div className="execution-result">
+                        <div className="execution-section-title">
+                          结果: <span className={`status-text ${statusClass}-text`}>{result.status}</span>
+                        </div>
+                        
+                        <div className="execution-result-content">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
+                            rehypePlugins={[rehypeKatex]}
+                            components={markdownComponents}
+                            skipHtml={false}
+                          >
+                            {safeString(result.content)}
+                          </ReactMarkdown>
+                        </div>
+                        
+                        {result.assessment && (
+                          <div className="execution-assessment">
+                            <div className="execution-section-title">评估结果</div>
+                            <div className="assessment-item">
+                              <span className="assessment-label">满足度:</span>
+                              <span className={`assessment-value ${result.assessment.satisfaction.includes('满足') ? 'success-text' : 'error-text'}`}>
+                                {result.assessment.satisfaction}
+                              </span>
+                            </div>
+                            <div className="assessment-item">
+                              <span className="assessment-label">置信度:</span>
+                              <span className="assessment-value confidence-text">{result.assessment.confidence}</span>
+                            </div>
+                            <div className="assessment-item reason-item">
+                              <span className="assessment-label">原因:</span>
+                              <span className="assessment-value">{result.assessment.reason}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {planData.finalOutput && (
+          <div className="execution-plan-final-output">
+            {/* <div className="execution-section-title">最终结果</div> */}
+            <div className="execution-final-content">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
+                rehypePlugins={[rehypeKatex]}
+                components={markdownComponents}
+                skipHtml={false}
+              >
+                {safeString(planData.finalOutput)}
+              </ReactMarkdown>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const parseContent = (text) => {
     if (!text || typeof text !== 'string') return [{ type: 'text', content: '' }];
 
-    const finalResponsePattern = /(?:最终回答|最终结果|生成回答)[:：]?\s*([\s\S]+)$/;
+    // 过滤掉提示语
+    text = filterPromptText(text);
+
+    // 检查是否为执行计划格式
+    if (isExecutionPlan(text)) {
+      return [{ type: 'execution-plan', content: text }];
+    }
+
+    const finalResponsePattern = /(?:最终回答|最终结果|生成回答|最终总结)[:：]?\s*([\s\S]+)$/;
     const finalResponseMatch = text.match(finalResponsePattern);
 
     if (finalResponseMatch) {
@@ -182,7 +443,7 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
 
       beforeParts.push({
         type: 'final-response',
-        content: finalResponseMatch[1].trim()
+        content: filterPromptText(finalResponseMatch[1].trim())
       });
 
       return beforeParts;
@@ -194,25 +455,24 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
   const parseContentParts = (text) => {
     const parts = [];
 
-    const assessmentPattern = /(?:\[结果评估\]|工具结果评估:)\s*(满足全部|满足|不满足|满足部分)(?:用户需求|执行预期|需求)?\s*\(置信度:\s*([\d.]+)\)(?:\s*\(工具执行成败：(True|False)\))?(?:\s*原因:\s*([\s\S]+?))?(?=是否需要执行其他工具:|$)/g;
-    const finalDecisionPattern = /(?:已获得满足需求的结果|问题已解决)(?:\(置信度:\s*([\d.]+)\))?[，,]?\s*将生成最终回答/g;
+    // 过滤掉提示语
+    text = filterPromptText(text);
+
+    // 简化：只关注工具执行和结果，移除评估部分
     const toolExecPattern = /执行工具[:：]\s*([^\s,，\n]+)(?:\s|$)/g;
-
+    
     const toolMatches = Array.from(text.matchAll(toolExecPattern));
-    const assessmentMatches = Array.from(text.matchAll(assessmentPattern));
-    const finalDecisionMatches = Array.from(text.matchAll(finalDecisionPattern));
 
-    if (toolMatches.length === 0 && assessmentMatches.length === 0 && finalDecisionMatches.length === 0) {
+    if (toolMatches.length === 0) {
       return [{ type: 'text', content: text }];
     }
 
     const allMatches = [
-      ...toolMatches.map(match => ({ type: 'tool', match, index: match.index })),
-      ...assessmentMatches.map(match => ({ type: 'assessment', match, index: match.index })),
-      ...finalDecisionMatches.map(match => ({ type: 'decision', match, index: match.index }))
+      ...toolMatches.map(match => ({ type: 'tool', match, index: match.index }))
     ].sort((a, b) => a.index - b.index);
 
     let lastEndIndex = 0;
+    let currentToolName = null;
 
     for (let i = 0; i < allMatches.length; i++) {
       const current = allMatches[i];
@@ -225,44 +485,15 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
         if (textContent) {
           parts.push({
             type: 'text',
-            content: textContent
+            content: filterPromptText(textContent)
           });
         }
       }
 
-      if (current.type === 'assessment') {
-        const match = current.match;
-        const satisfiesIntent = match[1].includes('满足') && !match[1].includes('部分') && !match[1].includes('不满足');
-        const partialSatisfies = match[1] === '满足部分' || match[1] === '部分满足';
-        const confidence = parseFloat(match[2]);
-        const toolExecutionSuccess = match[3] === 'True';
-        const reason = match[4] ? match[4].trim() : '';
-        
-        parts.push({
-          type: 'tool-assessment',
-          satisfiesIntent,
-          partialSatisfies,
-          confidence,
-          toolExecutionSuccess,
-          reason
-        });
-      } else if (current.type === 'decision') {
-        const match = current.match;
-        const confidence = match[1] ? parseFloat(match[1]) : null;
-
-        parts.push({
-          type: 'final-decision',
-          confidence
-        });
-      } else if (current.type === 'tool') {
+      if (current.type === 'tool') {
         const match = current.match;
         const toolName = match[1].trim();
-
-        parts.push({
-          type: 'tool-execution',
-          toolName,
-          parameters: null
-        });
+        currentToolName = toolName;
 
         const currentSegment = text.substring(currentIndex, nextIndex);
         const metaPattern = /meta=(?:None|null)\s+content=\[([\s\S]*?)\]\s+isError=(False|True)/i;
@@ -275,6 +506,7 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
           const isError = metaMatch[2].toLowerCase() === 'true';
 
           let resultContent = extractTextContent(fullMetaText);
+          resultContent = filterPromptText(resultContent);
 
           const urlRegex = /(https?:\/\/[^\s]+\.(jpeg|jpg|png|gif|webp|svg))/gi;
           const imageUrls = resultContent ? resultContent.match(urlRegex) : null;
@@ -284,17 +516,20 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
             content: resultContent,
             isJson: resultContent && typeof resultContent === 'string' && (resultContent.trim().startsWith('{') || resultContent.trim().startsWith('[')),
             isError,
-            imageUrls: imageUrls || []
+            imageUrls: imageUrls || [],
+            toolName
           });
 
           const afterMetaEndIndex = currentIndex + metaEndIndex;
           if (afterMetaEndIndex < nextIndex) {
             const afterMetaText = text.substring(afterMetaEndIndex, nextIndex).trim();
 
-            if (afterMetaText) {
+            // 移除评估相关内容
+            const cleanText = afterMetaText.replace(/工具结果评估.*?(是否需要执行其他工具:.*?)(?=\n|$)/gs, '');
+            if (cleanText.trim()) {
               parts.push({
                 type: 'text',
-                content: afterMetaText
+                content: filterPromptText(cleanText)
               });
             }
           }
@@ -303,36 +538,43 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
           const resultText = text.substring(afterCommandIndex, nextIndex).trim();
 
           if (resultText) {
-            const dataContentPattern = /data:\s*{"content":\s*"([^"}]*)"}(?:\n|$)/g;
-            let dataMatches = Array.from(resultText.matchAll(dataContentPattern));
+            // 移除评估相关内容
+            const cleanText = resultText.replace(/工具结果评估.*?(是否需要执行其他工具:.*?)(?=\n|$)/gs, '');
+            
+            if (cleanText.trim()) {
+              const dataContentPattern = /data:\s*{"content":\s*"([^"}]*)"}(?:\n|$)/g;
+              let dataMatches = Array.from(cleanText.matchAll(dataContentPattern));
 
-            if (dataMatches.length > 0) {
-              let combinedContent = '';
-              for (const dataMatch of dataMatches) {
-                try {
-                  const content = dataMatch[1]
-                    .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
-                  combinedContent += content;
-                } catch (e) {
-                  combinedContent += dataMatch[1];
+              if (dataMatches.length > 0) {
+                let combinedContent = '';
+                for (const dataMatch of dataMatches) {
+                  try {
+                    const content = dataMatch[1]
+                      .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+                    combinedContent += content;
+                  } catch (e) {
+                    combinedContent += dataMatch[1];
+                  }
                 }
-              }
 
-              if (combinedContent) {
+                if (combinedContent) {
+                  parts.push({
+                    type: 'tool-result',
+                    content: filterPromptText(combinedContent),
+                    isJson: false,
+                    isError: false,
+                    toolName
+                  });
+                }
+              } else {
                 parts.push({
                   type: 'tool-result',
-                  content: combinedContent,
-                  isJson: false,
-                  isError: false
+                  content: filterPromptText(cleanText),
+                  isJson: cleanText.trim().startsWith('{') || cleanText.trim().startsWith('['),
+                  isError: false,
+                  toolName
                 });
               }
-            } else {
-              parts.push({
-                type: 'tool-result',
-                content: resultText,
-                isJson: resultText.trim().startsWith('{') || resultText.trim().startsWith('['),
-                isError: false
-              });
             }
           }
         }
@@ -343,10 +585,12 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
 
     if (lastEndIndex < text.length) {
       const finalText = text.substring(lastEndIndex).trim();
-      if (finalText) {
+      // 移除评估相关内容
+      const cleanText = finalText.replace(/工具结果评估.*?(是否需要执行其他工具:.*?)(?=\n|$)/gs, '');
+      if (cleanText.trim()) {
         parts.push({
           type: 'text',
-          content: finalText
+          content: filterPromptText(cleanText)
         });
       }
     }
@@ -354,120 +598,11 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
     return parts;
   };
 
-  const contentParts = parseContent(content);
-
-  const renderJsonWithHighlight = (jsonStr) => {
-    return (
-      <pre className="json-formatted">
-        <code
-          className="language-json"
-          dangerouslySetInnerHTML={{ __html: syntaxHighlightJson(jsonStr) }}
-        />
-      </pre>
-    );
-  };
-
-  const darkThemeStyles = {
-    "--tool-bg": "#2c3e50",
-    "--tool-border": "#61dafb",
-    "--tool-text": "#61dafb",
-    "--tool-shadow": "rgba(0, 0, 0, 0.2)",
-    "--tool-hover-shadow": "rgba(0, 0, 0, 0.25)",
-    "--param-bg": "rgba(97, 218, 251, 0.1)",
-    "--param-text": "rgba(255, 255, 255, 0.85)",
-    "--param-label": "rgba(255, 255, 255, 0.6)",
-    "--result-bg": "#1e2a38",
-    "--result-border": "#61dafb",
-    "--result-text": "rgba(255, 255, 255, 0.85)",
-    "--result-shadow": "rgba(0, 0, 0, 0.15)",
-    "--result-hover-shadow": "rgba(0, 0, 0, 0.2)",
-    "--json-bg": "#172634",
-    "--json-text": "rgba(255, 255, 255, 0.9)",
-    "--json-key": "#61dafb",
-    "--json-string": "#a5d6a7",
-    "--json-number": "#ce93d8",
-    "--json-boolean": "#ffcc80",
-    "--json-null": "#ef9a9a",
-    "--error-bg": "rgba(220, 53, 69, 0.1)",
-    "--error-border": "#dc3545",
-    "--collapse-icon-color": "#61dafb",
-    "--collapse-icon-hover": "#7ee2ff",
-    "--confidence-bg": "#333e4c",
-    "--confidence-text": "#ffffff"
-  };
-
-  const lightThemeStyles = {
-    "--tool-bg": "#f0f7ff",
-    "--tool-border": "#1677ff",
-    "--tool-text": "#1677ff",
-    "--tool-shadow": "rgba(0, 0, 0, 0.08)",
-    "--tool-hover-shadow": "rgba(0, 0, 0, 0.12)",
-    "--param-bg": "rgba(22, 119, 255, 0.05)",
-    "--param-text": "#333333",
-    "--param-label": "#666666",
-    "--result-bg": "#f8f9fa",
-    "--result-border": "#1677ff",
-    "--result-text": "#333333",
-    "--result-shadow": "rgba(0, 0, 0, 0.08)",
-    "--result-hover-shadow": "rgba(0, 0, 0, 0.12)",
-    "--json-bg": "#f6f8fa",
-    "--json-text": "#333333",
-    "--json-key": "#1677ff",
-    "--json-string": "#2e7d32",
-    "--json-number": "#7b1fa2",
-    "--json-boolean": "#e65100",
-    "--json-null": "#d32f2f",
-    "--error-bg": "rgba(244, 67, 54, 0.05)",
-    "--error-border": "#f44336",
-    "--collapse-icon-color": "#1677ff",
-    "--collapse-icon-hover": "#4096ff",
-    "--confidence-bg": "#eef5ff",
-    "--confidence-text": "#1677ff"
-  };
-
-  const themeStyles = currentTheme === 'dark' ? darkThemeStyles : lightThemeStyles;
-
-  const CollapsibleIcon = ({ isCollapsed, onClick }) => (
-    <div
-      className="collapsible-icon"
-      onClick={(e) => {
-        if (isScrollingRef.current) return;
-        e.stopPropagation();
-        e.preventDefault();
-        onClick(e);
-      }}
-      onMouseEnter={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-      onMouseLeave={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-      title={isCollapsed ? "展开" : "折叠"}
-    >
-      {isCollapsed ? (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      ) : (
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )}
-    </div>
-  );
-
-  const ConfidenceBadge = ({ confidence }) => {
-    return (
-      <div className="confidence-badge">
-        置信度: {confidence.toFixed(2)}
-      </div>
-    );
-  };
-
   const processContent = (content) => {
     if (!content) return { type: 'text', content: '' };
+    
+    // 过滤掉提示语
+    content = filterPromptText(content);
     
     const extractImageUrls = (text) => {
       if (text && typeof text === 'string' && text.includes('http') && text.includes(',')) {
@@ -552,229 +687,305 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
     return { type: 'text', content };
   };
 
-  return (
+  // 渲染工具执行动画
+  const ToolExecutingAnimation = ({ toolName }) => (
+    <div className="tool-executing-animation">
+      <span>{toolName} 工具执行中</span>
+      <div className="loading-dots">
+        <div className="dot"></div>
+        <div className="dot"></div>
+        <div className="dot"></div>
+      </div>
+    </div>
+  );
+
+  const contentParts = parseContent(content);
+  
+  // 创建工具执行状态映射
+  const executingToolsMap = {};
+  contentParts.forEach(part => {
+    if (part.type === 'tool-result' && part.toolName) {
+      executingToolsMap[part.toolName] = false; // 如果有结果，则不在执行中
+    }
+  });
+  
+  // 找出正在执行中但没有结果的工具
+  Object.keys(executingTools).forEach(toolName => {
+    if (executingTools[toolName] && !(toolName in executingToolsMap)) {
+      executingToolsMap[toolName] = true;
+    }
+  });
+
+  // 渲染折叠/展开图标组件
+  const CollapsibleIcon = ({ isCollapsed, onClick }) => (
     <div
-      ref={containerRef}
-      className={`tool-execution-renderer theme-${currentTheme}`}
-      data-theme={currentTheme}
-      style={themeStyles}
-      onMouseEnter={(e) => e.stopPropagation()}
-      onMouseLeave={(e) => e.stopPropagation()}
-      onClick={(e) => e.stopPropagation()}
-      key={`tool-execution-${renderKey}`}
+      className="collapsible-icon"
+      onClick={(e) => {
+        if (isScrollingRef.current) return;
+        e.stopPropagation();
+        e.preventDefault();
+        onClick(e);
+      }}
+      onMouseEnter={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      onMouseLeave={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      title={isCollapsed ? "展开" : "折叠"}
     >
-      {contentParts.map((part, index) => {
-        if (part.type === 'text') {
-          return (
-            <div key={`text-${index}`} className="llm-response">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
-                rehypePlugins={[rehypeKatex]}
-                components={markdownComponents}
-                skipHtml={false}
-              >
-                {safeString(part.content)}
-              </ReactMarkdown>
-            </div>
-          );
-        } else if (part.type === 'tool-execution') {
-          return (
-            <div
-              key={`tool-execution-${index}`}
-              className="tool-execution-wrapper"
-              onClick={(e) => e.stopPropagation()}
-              onMouseEnter={(e) => e.stopPropagation()}
-              onMouseLeave={(e) => e.stopPropagation()}
-            >
-              <div className="tool-execution-block">
-                <div className="tool-execution-header">
-                  <span className="tool-name">执行工具: {part.toolName}</span>
+      {isCollapsed ? (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      ) : (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 8H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )}
+    </div>
+  );
+
+  const darkThemeStyles = {
+    "--tool-bg": "#2c3e50",
+    "--tool-border": "#61dafb",
+    "--tool-text": "#61dafb",
+    "--tool-shadow": "rgba(0, 0, 0, 0.2)",
+    "--tool-hover-shadow": "rgba(0, 0, 0, 0.25)",
+    "--param-bg": "rgba(97, 218, 251, 0.1)",
+    "--param-text": "rgba(255, 255, 255, 0.85)",
+    "--param-label": "rgba(255, 255, 255, 0.6)",
+    "--result-bg": "#1e2a38",
+    "--result-border": "#61dafb",
+    "--result-text": "rgba(255, 255, 255, 0.85)",
+    "--result-shadow": "rgba(0, 0, 0, 0.15)",
+    "--result-hover-shadow": "rgba(0, 0, 0, 0.2)",
+    "--json-bg": "#172634",
+    "--json-text": "rgba(255, 255, 255, 0.9)",
+    "--json-key": "#61dafb",
+    "--json-string": "#a5d6a7",
+    "--json-number": "#ce93d8",
+    "--json-boolean": "#ffcc80",
+    "--json-null": "#ef9a9a",
+    "--error-bg": "rgba(220, 53, 69, 0.1)",
+    "--error-border": "#dc3545",
+    "--collapse-icon-color": "#61dafb",
+    "--collapse-icon-hover": "#7ee2ff",
+    "--confidence-bg": "#333e4c",
+    "--confidence-text": "#ffffff",
+    "--execution-plan-bg": "#1e2a38",
+    "--execution-plan-border": "#39465a",
+    "--execution-step-bg": "#2c3e50",
+    "--execution-step-border": "#39465a",
+    "--execution-step-success-bg": "rgba(76, 175, 80, 0.15)",
+    "--execution-step-error-bg": "rgba(244, 67, 54, 0.15)",
+    "--execution-step-pending-bg": "rgba(255, 152, 0, 0.15)",
+    "--execution-assessment-bg": "rgba(97, 218, 251, 0.1)"
+  };
+
+  const lightThemeStyles = {
+    "--tool-bg": "#f0f7ff",
+    "--tool-border": "#1677ff",
+    "--tool-text": "#1677ff",
+    "--tool-shadow": "rgba(0, 0, 0, 0.08)",
+    "--tool-hover-shadow": "rgba(0, 0, 0, 0.12)",
+    "--param-bg": "rgba(22, 119, 255, 0.05)",
+    "--param-text": "#333333",
+    "--param-label": "#666666",
+    "--result-bg": "#f8f9fa",
+    "--result-border": "#1677ff",
+    "--result-text": "#333333",
+    "--result-shadow": "rgba(0, 0, 0, 0.08)",
+    "--result-hover-shadow": "rgba(0, 0, 0, 0.12)",
+    "--json-bg": "#f6f8fa",
+    "--json-text": "#333333",
+    "--json-key": "#1677ff",
+    "--json-string": "#2e7d32",
+    "--json-number": "#7b1fa2",
+    "--json-boolean": "#e65100",
+    "--json-null": "#d32f2f",
+    "--error-bg": "rgba(244, 67, 54, 0.05)",
+    "--error-border": "#f44336",
+    "--collapse-icon-color": "#1677ff",
+    "--collapse-icon-hover": "#4096ff",
+    "--confidence-bg": "#eef5ff",
+    "--confidence-text": "#1677ff",
+    "--execution-plan-bg": "#ffffff",
+    "--execution-plan-border": "#e0e0e0",
+    "--execution-step-bg": "#ffffff",
+    "--execution-step-border": "#e0e0e0",
+    "--execution-step-success-bg": "#e8f5e9",
+    "--execution-step-error-bg": "#ffebee",
+    "--execution-step-pending-bg": "#fff3e0",
+    "--execution-assessment-bg": "#eef5ff"};
+
+    const themeStyles = currentTheme === 'dark' ? darkThemeStyles : lightThemeStyles;
+  
+    const renderJsonWithHighlight = (jsonStr) => {
+      return (
+        <pre className="json-formatted">
+          <code
+            className="language-json"
+            dangerouslySetInnerHTML={{ __html: syntaxHighlightJson(jsonStr) }}
+          />
+        </pre>
+      );
+    };
+  
+    return (
+      <div
+        ref={containerRef}
+        className={`tool-execution-renderer theme-${currentTheme}`}
+        data-theme={currentTheme}
+        style={themeStyles}
+        onMouseEnter={(e) => e.stopPropagation()}
+        onMouseLeave={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+        key={`tool-execution-${renderKey}`}
+      >
+        {contentParts.map((part, index) => {
+          // 处理执行计划类型
+          if (part.type === 'execution-plan') {
+            const planData = parseExecutionPlan(part.content);
+            if (!planData) {
+              return (
+                <div key={`invalid-plan-${index}`} className="execution-plan-error">
+                  无法解析执行计划内容
                 </div>
+              );
+            }
+            return renderExecutionPlan(planData);
+          }
+          else if (part.type === 'text') {
+            return (
+              <div key={`text-${index}`} className="llm-response">
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
+                  rehypePlugins={[rehypeKatex]}
+                  components={markdownComponents}
+                  skipHtml={false}
+                >
+                  {safeString(part.content)}
+                </ReactMarkdown>
               </div>
-            </div>
-          );
-        } else if (part.type === 'tool-result') {
-          const resultId = `tool-result-${index}`;
-          const isCollapsed = getCollapsedState(resultId);
-
-          let confidence = null;
-          let nextIndex = index + 1;
-          if (nextIndex < contentParts.length && contentParts[nextIndex].type === 'tool-assessment') {
-            confidence = contentParts[nextIndex].confidence;
-          }
-        
-          const urlRegex = /(https?:\/\/[^\s]+\.(jpeg|jpg|png|gif|webp|svg))/gi;
-          const content = safeString(part.content);
-          const imageUrls = content ? content.match(urlRegex) : null;
-
-          let textContent = content;
-          if (imageUrls && imageUrls.length > 0) {
-            textContent = content.split('\n').filter(line => {
-              return !imageUrls.some(url => line.includes(url));
-            }).join('\n');
-          }
-        
-          return (
-            <div
-              key={resultId}
-              className="tool-result-wrapper"
-              onClick={(e) => e.stopPropagation()}
-              onMouseEnter={(e) => e.stopPropagation()}
-              onMouseLeave={(e) => e.stopPropagation()}
-              data-result-id={resultId}
-            >
+            );
+          } else if (part.type === 'tool-result') {
+            const resultId = `tool-result-${index}`;
+            const isCollapsed = getCollapsedState(resultId);
+            const toolName = part.toolName;
+          
+            const urlRegex = /(https?:\/\/[^\s]+\.(jpeg|jpg|png|gif|webp|svg))/gi;
+            const content = safeString(part.content);
+            const imageUrls = content ? content.match(urlRegex) : null;
+  
+            let textContent = content;
+            if (imageUrls && imageUrls.length > 0) {
+              textContent = content.split('\n').filter(line => {
+                return !imageUrls.some(url => line.includes(url));
+              }).join('\n');
+            }
+          
+            return (
               <div
-                className={`tool-result-content ${part.isError ? 'has-error' : ''} ${isCollapsed ? 'is-collapsed' : ''}`}
-                onClick={(e) => {
-                  if (isScrollingRef.current) return;
-        
-                  if (isCollapsed && !e.target.closest('.collapsible-icon')) {
-                    toggleCollapse(resultId, e);
-                  }
-                  e.stopPropagation();
-                }}
+                key={resultId}
+                className="tool-result-wrapper"
+                onClick={(e) => e.stopPropagation()}
+                onMouseEnter={(e) => e.stopPropagation()}
+                onMouseLeave={(e) => e.stopPropagation()}
+                data-result-id={resultId}
               >
-                <div className="tool-result-header">
-                  {confidence !== null && (
-                    <ConfidenceBadge confidence={confidence} />
-                  )}
-                  <div className="collapsible-icon-container">
-                    <CollapsibleIcon
-                      isCollapsed={isCollapsed}
-                      onClick={(e) => toggleCollapse(resultId, e)}
-                    />
+                <div
+                  className={`tool-result-content ${part.isError ? 'has-error' : ''} ${isCollapsed ? 'is-collapsed' : ''}`}
+                  onClick={(e) => {
+                    if (isScrollingRef.current) return;
+          
+                    if (isCollapsed && !e.target.closest('.collapsible-icon')) {
+                      toggleCollapse(resultId, e);
+                    }
+                    e.stopPropagation();
+                  }}
+                >
+                  <div className="tool-result-header">
+                    <div className="tool-result-info">
+                      {toolName && <span className="tool-result-name">{toolName}</span>}
+                    </div>
+                    <div className="collapsible-icon-container">
+                      <CollapsibleIcon
+                        isCollapsed={isCollapsed}
+                        onClick={(e) => toggleCollapse(resultId, e)}
+                      />
+                    </div>
                   </div>
-                </div>
-        
-                <div className="tool-result-inner">
-                  {part.isJson ? (
-                    renderJsonWithHighlight(formatJsonString(part.content))
-                  ) : (
-                    <>
-                      {textContent && textContent.trim() !== '' && (
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
-                          rehypePlugins={[rehypeKatex]}
-                          components={markdownComponents}
-                          skipHtml={false}
-                        >
-                          {textContent}
-                        </ReactMarkdown>
-                      )}
-                      
-                      {imageUrls && imageUrls.length > 0 && (
-                        <div className="tool-result-images">
-                          <ImageGallery 
-                            content={imageUrls}
-                            isUrlList={true}
-                            onSendEditMessage={(messageText, imageUrl) => {
-                              if (!messageText || !imageUrl) {
-                                console.error('编辑图片参数不完整:', { messageText, imageUrl });
-                                return;
-                              }
-                              
-                              const editEvent = new CustomEvent('image-edit-request', {
-                                bubbles: true,
-                                detail: { 
-                                  messageText, 
-                                  imageUrl
+          
+                  <div className="tool-result-inner">
+                    {part.isJson ? (
+                      renderJsonWithHighlight(formatJsonString(part.content))
+                    ) : (
+                      <>
+                        {textContent && textContent.trim() !== '' && (
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
+                            rehypePlugins={[rehypeKatex]}
+                            components={markdownComponents}
+                            skipHtml={false}
+                          >
+                            {textContent}
+                          </ReactMarkdown>
+                        )}
+                        
+                        {imageUrls && imageUrls.length > 0 && (
+                          <div className="tool-result-images">
+                            <ImageGallery 
+                              content={imageUrls}
+                              isUrlList={true}
+                              onSendEditMessage={(messageText, imageUrl) => {
+                                if (!messageText || !imageUrl) {
+                                  console.error('编辑图片参数不完整:', { messageText, imageUrl });
+                                  return;
                                 }
-                              });
-                              document.dispatchEvent(editEvent);
-                            }} 
-                          />
-                        </div>
-                      )}
-                    </>
-                  )}
+                                
+                                const editEvent = new CustomEvent('image-edit-request', {
+                                  bubbles: true,
+                                  detail: { 
+                                    messageText, 
+                                    imageUrl
+                                  }
+                                });
+                                document.dispatchEvent(editEvent);
+                              }} 
+                            />
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        } else if (part.type === 'final-response') {
-          const contentData = processContent(part.content);
-          
-          return (
-            <div key={`final-response-${index}`} className="final-response-wrapper">
-              <div className="final-response-content">
-                {contentData.type === 'text' && (
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
-                    rehypePlugins={[rehypeKatex]}
-                    components={markdownComponents}
-                    skipHtml={false}
-                  >
-                    {safeString(contentData.content)}
-                  </ReactMarkdown>
-                )}
-                
-                {contentData.type === 'single-image' && (
-                  <div className="final-response-image">
-                    <ImageGallery 
-                      content={contentData.url} 
-                      isUrlList={false}
-                      onSendEditMessage={(messageText, imageUrl) => {
-                        if (!messageText || !imageUrl) {
-                          console.error('编辑图片参数不完整:', { messageText, imageUrl });
-                          return;
-                        }
-                        
-                        const editEvent = new CustomEvent('image-edit-request', {
-                          bubbles: true,
-                          detail: { 
-                            messageText, 
-                            imageUrl
-                          }
-                        });
-                        document.dispatchEvent(editEvent);
-                      }} 
-                    />
-                  </div>
-                )}
-          
-                {contentData.type === 'multi-image' && (
-                  <div className="final-response-images">
-                    <ImageGallery 
-                      content={contentData.urls}
-                      isUrlList={true}  
-                      onSendEditMessage={(messageText, imageUrl) => {
-                        if (!messageText || !imageUrl) {
-                          console.error('编辑图片参数不完整:', { messageText, imageUrl });
-                          return;
-                        }
-                        
-                        const editEvent = new CustomEvent('image-edit-request', {
-                          bubbles: true,
-                          detail: { 
-                            messageText, 
-                            imageUrl
-                          }
-                        });
-                        document.dispatchEvent(editEvent);
-                      }} 
-                    />
-                  </div>
-                )}
-          
-                {contentData.type === 'text-with-images' && (
-                  <>
-                    {contentData.content && (
-                      <div className="final-response-text">
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
-                          rehypePlugins={[rehypeKatex]}
-                          components={markdownComponents}
-                          skipHtml={false}
-                        >
-                          {safeString(contentData.content)}
-                        </ReactMarkdown>
-                      </div>
-                    )}
-                    
-                    <div className="final-response-images">
+            );
+          } else if (part.type === 'final-response') {
+            const contentData = processContent(part.content);
+            
+            return (
+              <div key={`final-response-${index}`} className="final-response-wrapper">
+                <div className="final-response-content">
+                  {contentData.type === 'text' && (
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
+                      rehypePlugins={[rehypeKatex]}
+                      components={markdownComponents}
+                      skipHtml={false}
+                    >
+                      {safeString(contentData.content)}
+                    </ReactMarkdown>
+                  )}
+                  
+                  {contentData.type === 'single-image' && (
+                    <div className="final-response-image">
                       <ImageGallery 
-                        content={contentData.imageUrls}
-                        isUrlList={true} 
+                        content={contentData.url} 
+                        isUrlList={false}
                         onSendEditMessage={(messageText, imageUrl) => {
                           if (!messageText || !imageUrl) {
                             console.error('编辑图片参数不完整:', { messageText, imageUrl });
@@ -792,58 +1003,110 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
                         }} 
                       />
                     </div>
-                  </>
-                )}
-          
-                {contentData.type === 'structured' && (
-                  <div className="final-response-structured">
-                    <ImageGallery 
-                      content={contentData.content}
-                      isUrlList={false} 
-                      onSendEditMessage={(messageText, imageUrl) => {
-                        if (!messageText || !imageUrl) {
-                          console.error('编辑图片参数不完整:', { messageText, imageUrl });
-                          return;
-                        }
-                        
-                        const editEvent = new CustomEvent('image-edit-request', {
-                          bubbles: true,
-                          detail: { 
-                            messageText, 
-                            imageUrl
+                  )}
+            
+                  {contentData.type === 'multi-image' && (
+                    <div className="final-response-images">
+                      <ImageGallery 
+                        content={contentData.urls}
+                        isUrlList={true}  
+                        onSendEditMessage={(messageText, imageUrl) => {
+                          if (!messageText || !imageUrl) {
+                            console.error('编辑图片参数不完整:', { messageText, imageUrl });
+                            return;
                           }
-                        });
-                        document.dispatchEvent(editEvent);
-                      }} 
-                    />
-                  </div>
-                )}
+                          
+                          const editEvent = new CustomEvent('image-edit-request', {
+                            bubbles: true,
+                            detail: { 
+                              messageText, 
+                              imageUrl
+                            }
+                          });
+                          document.dispatchEvent(editEvent);
+                        }} 
+                      />
+                    </div>
+                  )}
+            
+                  {contentData.type === 'text-with-images' && (
+                    <>
+                      {contentData.content && (
+                        <div className="final-response-text">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
+                            rehypePlugins={[rehypeKatex]}
+                            components={markdownComponents}
+                            skipHtml={false}
+                          >
+                            {safeString(contentData.content)}
+                          </ReactMarkdown>
+                        </div>
+                      )}
+                      
+                      <div className="final-response-images">
+                        <ImageGallery 
+                          content={contentData.imageUrls}
+                          isUrlList={true} 
+                          onSendEditMessage={(messageText, imageUrl) => {
+                            if (!messageText || !imageUrl) {
+                              console.error('编辑图片参数不完整:', { messageText, imageUrl });
+                              return;
+                            }
+                            
+                            const editEvent = new CustomEvent('image-edit-request', {
+                              bubbles: true,
+                              detail: { 
+                                messageText, 
+                                imageUrl
+                              }
+                            });
+                            document.dispatchEvent(editEvent);
+                          }} 
+                        />
+                      </div>
+                    </>
+                  )}
+            
+                  {contentData.type === 'structured' && (
+                    <div className="final-response-structured">
+                      <ImageGallery 
+                        content={contentData.content}
+                        isUrlList={false} 
+                        onSendEditMessage={(messageText, imageUrl) => {
+                          if (!messageText || !imageUrl) {
+                            console.error('编辑图片参数不完整:', { messageText, imageUrl });
+                            return;
+                          }
+                          
+                          const editEvent = new CustomEvent('image-edit-request', {
+                            bubbles: true,
+                            detail: { 
+                              messageText, 
+                              imageUrl
+                            }
+                          });
+                          document.dispatchEvent(editEvent);
+                        }} 
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        // } else if (part.type === 'tool-assessment') {
-        //   return (
-        //     <div key={`assessment-${index}`} className="tool-assessment-wrapper">
-        //       <div className={`tool-assessment-content ${part.satisfiesIntent ? 'satisfies' : (part.partialSatisfies ? 'partial' : 'not-satisfies')}`}>
-        //         <div className="assessment-header">
-        //           <div className="assessment-result">
-        //             {part.satisfiesIntent ? '满足需求' : (part.partialSatisfies ? '满足部分需求' : '不满足需求')}
-        //             {part.confidence && <ConfidenceBadge confidence={part.confidence} />}
-        //           </div>
-        //         </div>
-        //         {part.reason && (
-        //           <div className="assessment-reason">
-        //             <strong>原因:</strong> {part.reason}
-        //           </div>
-        //         )}
-        //       </div>
-        //     </div>
-        //   );
-        }
-        return null;
-      })}
-    </div>
-  );
-});
-
-export default ToolExecutionRenderer;
+            );
+          }
+          
+          return null;
+        })}
+        
+        {/* 渲染正在执行中的工具动画 */}
+        {Object.entries(executingToolsMap).map(([toolName, isExecuting]) => 
+          isExecuting ? (
+            <ToolExecutingAnimation key={`executing-${toolName}`} toolName={toolName} />
+          ) : null
+        )}
+      </div>
+    );
+  });
+  
+  export default ToolExecutionRenderer;

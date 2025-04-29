@@ -33,7 +33,6 @@ function Header({ title, onExportChat, onDeleteConversation, currentConversation
           ⋮
         </button>
 
-        {/* 下拉菜单 */}
         {showMenu && (
           <div className="dropdown-menu">
             <div className="dropdown-item" onClick={() => {

@@ -1,22 +1,25 @@
-/* =========================================
- * 基础消息样式
- * ========================================= */
 .message {
   padding: 0;
-  margin-bottom: 12px;
-  max-width: 70%;
+  margin-bottom: 8px; 
+  max-width: 100%;
   display: flex;
   position: relative;
+  border: none !important; 
+  outline: none !important; 
+  box-shadow: none !important;
 }
 
-/* 用户消息靠右显示 */
+
 .user-message {
-  align-self: flex-end;
-  margin-left: auto;
-  margin-right: 0;
+  align-self: flex-end !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+  background-color: #e0e0e0 !important;
+  border-radius: 8px !important;
+  padding: 6px 8px !important;
 }
 
-/* 助手消息靠左显示 */
+
 .assistant-message {
   align-self: flex-start;
   margin-right: auto;
@@ -28,7 +31,7 @@
   max-width: 100%;
 }
 
-/* 消息元数据样式 */
+
 .message-info {
   display: flex;
   font-size: 12px;
@@ -47,17 +50,16 @@
   color: #999;
 }
 
-/* 针对图片消息添加特殊控制 */
+
 .message.with-image {
-  max-width: 50%;
+  max-width: 100%;
 }
 
-/* =========================================
- * 消息文本样式
- * ========================================= */
+
+
 .message-text {
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 8px 12px; 
+  border-radius: 0;
   word-break: break-word;
   overflow-wrap: break-word;
   white-space: pre-wrap;
@@ -65,23 +67,23 @@
   line-height: 1.6;
   text-align: left;
   transition: height 0.2s ease;
+  border: none; 
 }
 
 .user-message .message-text {
-  background-color: #f2f2f2;
+  background-color: transparent; 
   color: #000000;
 }
 
 .assistant-message .message-text {
-  background-color: #ffffff;
+  background-color: transparent;
   color: #262626;
-  border: 1px solid #f0f0f0;
+  border: none; 
 }
 
-/* =========================================
- * Markdown 元素样式
- * ========================================= */
-/* 代码块样式 */
+
+
+
 .message-text pre {
   border-radius: 8px;
   margin: 8px 0;
@@ -92,7 +94,7 @@
   background-color: #e0e0e0 !important;
 }
 
-/* 内联代码样式 */
+
 .message-text code:not(pre code) {
   padding: 2px 5px;
   border-radius: 4px;
@@ -107,7 +109,7 @@
   color: #333333;
 }
 
-/* 表格样式 */
+
 .table-container {
   overflow-x: auto;
   margin: 12px 0;
@@ -135,7 +137,7 @@
   background-color: #f0f0f0;
 }
 
-/* 链接样式 */
+
 .message-text a {
   text-decoration: underline;
 }
@@ -144,7 +146,7 @@
   color: #1677ff;
 }
 
-/* 列表样式 */
+
 .message-text ul,
 .message-text ol {
   padding-left: 24px;
@@ -152,7 +154,7 @@
   text-align: left;
 }
 
-/* 引用块样式 */
+
 .message-text blockquote {
   border-left: 4px solid;
   padding-left: 12px;
@@ -171,7 +173,6 @@
   border-radius: 0 4px 4px 0;
 }
 
-/* 图片样式 */
 .message-text img, .markdown-image {
   border-radius: 8px;
   margin: 8px 0;
@@ -180,21 +181,21 @@
   height: auto;
 }
 
-/* =========================================
- * 思考过程相关样式
- * ========================================= */
-/* 消息气泡样式 */
+
+
+
+
 .message-bubble {
   position: relative;
-  border-radius: 12px;
-  background-color: #fff; /* 助手消息背景 */
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none; 
   overflow: hidden;
   width: 100%;
 }
 
 
-/* 思考按钮容器 - 置于消息左上角 */
+
 .thinking-button-container {
   position: absolute;
   top: 6px;
@@ -202,7 +203,7 @@
   z-index: 10;
 }
 
-/* 思考切换按钮样式 */
+
 .thinking-toggle-button {
   background-color: rgba(240, 240, 240, 0.85);
   border: 1px solid #ddd;
@@ -219,11 +220,11 @@
   line-height: 1.4;
 }
 
-/* 消息内部内容布局 */
+
 .message-inner-content {
   display: flex;
   flex-direction: column;
-  padding: 36px 16px 16px 16px; /* 顶部增加padding为思考按钮留空间 */
+  padding: 36px 16px 16px 16px;
 }
 
 .thinking-toggle-button:hover {
@@ -236,19 +237,19 @@
   transform: translateY(1px);
 }
 
-/* 思考内容弹出区域 */
+
 .thinking-content-popup {
   background-color: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
+  border: none; 
+  border-radius: 0; 
   margin: 8px 0 12px 0;
   max-height: 300px;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: none; 
 }
 
-/* 思考内容样式 */
+
 .thinking-content {
   padding: 12px 16px;
   font-size: 14px;
@@ -275,7 +276,7 @@
   border: 1px solid #eee;
 }
 
-/* 滚动条样式 */
+
 .thinking-content::-webkit-scrollbar {
   width: 6px;
 }
@@ -293,19 +294,19 @@
   background-color: #aaa;
 }
 
-/* 修正消息布局，为思考按钮留出空间 */
+
 .assistant-message .message-content {
   position: relative;
-  padding-top: 36px; /* 为顶部的思考按钮留出空间 */
+  padding-top: 36px;
 }
 
-/* 在思考过程打开时，增加内边距 */
+
 .assistant-message .message-content .thinking-content-popup + .message-text,
 .assistant-message .message-content .thinking-content-popup + .structured-content {
   margin-top: 8px;
 }
 
-/* 思考内容中的Markdown样式增强 */
+
 .thinking-content h1,
 .thinking-content h2,
 .thinking-content h3,
@@ -386,10 +387,9 @@
   text-decoration: underline;
 }
 
-/* =========================================
- * 图片和图片编辑相关样式
- * ========================================= */
-/* 直接URL图片容器 */
+
+
+
 .direct-image-container {
   width: auto;
   max-width: none;
@@ -397,36 +397,40 @@
   padding: 0;
   position: relative;
   overflow: visible;
+  background-color: transparent; 
+  border-radius: 0; 
+  border: none;
+  box-shadow: none; 
 }
 
-/* 确保嵌套在direct-image-container中的图片画廊组件宽度正确 */
+
 .direct-image-container .single-image-container,
 .direct-image-container .gallery-image-wrapper {
   width: 250px;
   margin: 0;
 }
 
-/* 确保图片预览模态框始终在最顶层 */
+
 .image-preview-modal {
   z-index: 9999;
 }
 
-/* 确保direct-image-container中的所有交互元素可点击 */
+
 .direct-image-container,
 .direct-image-container * {
   pointer-events: auto;
 }
 
-/* 调整direct-image-container为消息气泡风格 */
+
 .assistant-message .direct-image-container {
-  background-color: #ffffff;
-  border-radius: 8px;
+  background-color: transparent;
+  border-radius: 0;
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  border: 1px solid #f0f0f0;
+  box-shadow: none;
+  border: none;
 }
 
-/* 确保direct-image-container中的模态框正确显示 */
+
 .direct-image-container .image-preview-modal {
   position: fixed;
   top: 0;
@@ -436,7 +440,7 @@
   z-index: 1100;
 }
 
-/* 编辑指令消息样式 */
+
 .edit-instruction-message {
   display: flex;
   flex-direction: row;
@@ -487,7 +491,7 @@
   background-color: white;
 }
 
-/* 当在用户消息中显示编辑指令时的样式调整 */
+
 .user-message .edit-instruction-message {
   width: 100%;
   max-width: 400px;
@@ -496,27 +500,28 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* =========================================
- * 结构化内容相关样式
- * ========================================= */
-/* 结构化内容容器 */
+
+
+
+
+
 .structured-content-container {
   width: 100%;
   margin: 0 auto;
 }
 
-/* 结构化内容样式 */
+
 .structured-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px; 
   width: 100%;
-  border-radius: 8px;
+  border-radius: 0; 
   overflow: hidden;
-  background-color: #ffffff;
-  padding: 12px 16px;
+  background-color: transparent; 
+  padding: 8px 12px; 
   color: #262626;
-  border: 1px solid #f0f0f0;
+  border: none; 
 }
 
 .structured-text {
@@ -544,7 +549,7 @@
   overflow: hidden;
 }
 
-/* 图片说明文字 */
+
 .image-caption {
   padding: 8px;
   background-color: rgba(0, 0, 0, 0.03);
@@ -555,7 +560,7 @@
   border-bottom-right-radius: 8px;
 }
 
-/* 确保结构化内容中的图片容器宽度合适 */
+
 .structured-image .single-image-container,
 .structured-images .image-gallery-container {
   width: 100%;
@@ -563,10 +568,11 @@
   max-width: none;
 }
 
-/* =========================================
- * 文件预览组件样式
- * ========================================= */
-/* 结构化文件容器 */
+
+
+
+
+
 .structured-file {
   width: 100%;
   max-width: 450px;
@@ -575,7 +581,7 @@
   overflow: hidden;
 }
 
-/* 文件预览容器 */
+
 .file-preview-container {
   width: 100%;
   border: 1px solid #e0e0e0;
@@ -592,7 +598,7 @@
   border-color: #d0d0d0;
 }
 
-/* 文件预览头部 */
+
 .file-preview-header {
   padding: 10px 12px;
   background-color: #f0f0f0;
@@ -617,7 +623,7 @@
   text-overflow: ellipsis;
 }
 
-/* 文件预览内容 */
+
 .file-preview-content {
   padding: 12px;
   background-color: #ffffff;
@@ -638,7 +644,7 @@
   -webkit-box-orient: vertical;
 }
 
-/* 文件模态框 */
+
 .file-modal-overlay {
   position: fixed;
   top: 0;
@@ -713,7 +719,7 @@
   color: #333;
 }
 
-/* 加载中状态 */
+
 .file-preview-container.loading .file-preview-content {
   display: flex;
   flex-direction: column;
@@ -738,7 +744,7 @@
   }
 }
 
-/* 错误状态 */
+
 .file-preview-container.error {
   background-color: #fff8f8;
   border-color: #ffcdd2;
@@ -749,32 +755,32 @@
   font-size: 14px;
 }
 
-/* 特殊文件类型图标颜色 */
+
 .file-icon.txt, .file-icon.md {
-  color: #1677ff; /* 蓝色 - 文本文件 */
+  color: #1677ff; 
 }
 
 .file-icon.pdf {
-  color: #e53935; /* 红色 - PDF文件 */
+  color: #e53935; 
 }
 
 .file-icon.doc, .file-icon.docx {
-  color: #1565c0; /* 深蓝色 - Word文件 */
+  color: #1565c0; 
 }
 
 .file-icon.xls, .file-icon.xlsx, .file-icon.csv {
-  color: #2e7d32; /* 绿色 - Excel文件 */
+  color: #2e7d32; 
 }
 
 .file-icon.ppt, .file-icon.pptx {
-  color: #e64a19; /* 橙色 - PowerPoint文件 */
+  color: #e64a19;
 }
 
 .file-icon.json, .file-icon.xml {
-  color: #8e24aa; /* 紫色 - 数据文件 */
+  color: #8e24aa; 
 }
 
-/* 用户消息中的文件样式 */
+
 .user-message .structured-file {
   max-width: 400px;
   align-self: flex-end;
@@ -799,17 +805,16 @@
   color: #262626;
 }
 
-/* 如果用户直接使用了Markdown格式的文件引用 */
 .user-message .markdown-content .file-preview-container {
   max-width: 400px;
   margin-left: auto;
   margin-right: 0;
 }
 
-/* =========================================
- * 消息控制按钮样式
- * ========================================= */
-/* 消息控制按钮容器 */
+
+
+
+
 .message-controls {
   position: absolute;
   top: 5px;
@@ -819,18 +824,18 @@
   z-index: 10;
   opacity: 0;
   transition: opacity 0.2s ease;
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 4px;
+  background-color: transparent; 
+  border-radius: 0; 
   padding: 2px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: none; 
 }
 
-/* 当鼠标悬停在消息上时显示控制按钮 */
+
 .message:hover .message-controls {
   opacity: 1;
 }
 
-/* 控制按钮样式 */
+
 .control-button {
   width: 26px;
   height: 26px;
@@ -851,27 +856,27 @@
   color: #333;
 }
 
-/* 删除按钮样式 */
+
 .delete-button:hover {
-  color: #e53935; /* 红色 */
+  color: #e53935; 
 }
 
-/* 复制按钮样式 */
+
 .copy-button:hover {
-  color: #1677ff; /* 蓝色 */
+  color: #1677ff; 
 }
 
-/* 用户消息的控制按钮样式调整 */
+
 .user-message .message-controls {
   background-color: rgba(242, 242, 242, 0.9);
 }
 
-/* 助手消息的控制按钮样式调整 */
+
 .assistant-message .message-controls {
   background-color: rgba(255, 255, 255, 0.9);
 }
 
-/* 添加复制成功的提示样式 */
+
 .copy-tooltip {
   position: absolute;
   right: 40px;
@@ -891,10 +896,11 @@
   transform: translateY(0);
 }
 
-/* =========================================
- * 动画效果
- * ========================================= */
-/* 流式消息的光标闪烁效果 */
+
+
+
+
+
 .cursor-blink {
   display: inline-block;
   width: 2px;
@@ -914,7 +920,7 @@
   }
 }
 
-/* 删除确认对话框样式 */
+
 .delete-confirm-modal {
   position: fixed;
   top: 0;
@@ -961,11 +967,10 @@
   cursor: pointer;
 }
 
-/* =========================================
- * 响应式布局
- * ========================================= */
+
+
+
 @media (max-width: 768px) {
-  /* 基础消息样式调整 */
   .message {
     max-width: 80%;
   }
@@ -974,7 +979,7 @@
     max-width: 65%;
   }
 
-  /* 思考过程响应式调整 */
+
   .thinking-button-container {
     top: 4px;
     left: 8px;
@@ -993,13 +998,11 @@
     padding-top: 30px;
   }
 
-  /* 图片容器响应式调整 */
   .direct-image-container .single-image-container,
   .direct-image-container .gallery-image-wrapper {
     width: 200px;
   }
 
-  /* 编辑指令响应式调整 */
   .edit-instruction-message {
     flex-direction: column;
     max-width: 200px;
@@ -1020,12 +1023,10 @@
     max-height: 180px;
   }
 
-  /* 结构化内容响应式调整 */
   .structured-content {
     padding: 10px 14px;
   }
 
-  /* 文件预览响应式调整 */
   .structured-file {
     max-width: 380px;
   }
@@ -1046,7 +1047,6 @@
     font-size: 13px;
   }
 
-  /* 用户消息文件响应式调整 */
   .user-message .structured-file {
     max-width: 350px;
   }
@@ -1055,7 +1055,6 @@
     max-width: 350px;
   }
 
-  /* 控制按钮响应式调整 */
   .message-controls {
     padding: 3px;
   }
@@ -1067,7 +1066,6 @@
 }
 
 @media (max-width: 480px) {
-  /* 基础消息样式调整 */
   .message {
     max-width: 90%;
   }
@@ -1076,7 +1074,6 @@
     max-width: 80%;
   }
 
-  /* 图片相关响应式调整 */
   .message-text img, .markdown-image {
     max-height: 160px;
   }
@@ -1086,7 +1083,6 @@
     width: 170px;
   }
 
-  /* 编辑指令响应式调整 */
   .edit-instruction-message {
     max-width: 170px;
   }
@@ -1095,7 +1091,6 @@
     max-height: 160px;
   }
 
-  /* 结构化内容响应式调整 */
   .structured-content {
     padding: 8px 12px;
   }
@@ -1104,7 +1099,6 @@
     font-size: 13px;
   }
 
-  /* 文件预览响应式调整 */
   .structured-file {
     max-width: 320px;
   }
@@ -1129,7 +1123,6 @@
     padding: 10px;
   }
 
-  /* 用户消息文件响应式调整 */
   .user-message .structured-file {
     max-width: 280px;
   }
@@ -1138,26 +1131,26 @@
     max-width: 280px;
   }
 
-  /* 控制按钮响应式调整 */
   .control-button {
     width: 32px;
     height: 32px;
   }
 
   .message-controls {
-    opacity: 1; /* 在移动设备上始终显示控制按钮，便于触摸 */
+    opacity: 1; 
     top: 3px;
     right: 3px;
   }
 
-  /* 用户消息编辑指令响应式调整 */
   .user-message .edit-instruction-message {
     max-width: 300px;
   }
 }
 
 
-/* 消息文本样式 */
+
+
+
 .message-text {
   padding: 12px 16px;
   border-radius: 8px;
@@ -1181,7 +1174,7 @@
   border: 1px solid var(--assistant-message-border, #f0f0f0);
 }
 
-/* 消息气泡样式 */
+
 .message-bubble {
   position: relative;
   border-radius: 12px;
@@ -1191,7 +1184,7 @@
   width: 100%;
 }
 
-/* 思考切换按钮样式 */
+
 .thinking-toggle-button {
   background-color: var(--bg-secondary, rgba(240, 240, 240, 0.85));
   border: 1px solid var(--border-color, #ddd);
@@ -1208,7 +1201,7 @@
   line-height: 1.4;
 }
 
-/* 思考内容弹出区域 */
+
 .thinking-content-popup {
   background-color: var(--bg-secondary, #f9f9f9);
   border: 1px solid var(--border-color, #e0e0e0);
@@ -1220,7 +1213,7 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-/* 思考内容样式 */
+
 .thinking-content {
   padding: 12px 16px;
   font-size: 14px;
@@ -1229,7 +1222,7 @@
   white-space: pre-wrap;
 }
 
-/* 消息元数据样式 */
+
 .message-info {
   display: flex;
   font-size: 12px;
@@ -1248,7 +1241,7 @@
   color: var(--text-tertiary, #999);
 }
 
-/* 调整direct-image-container为消息气泡风格 */
+
 .assistant-message .direct-image-container {
   background-color: var(--assistant-message-bg, #ffffff);
   border-radius: 8px;
@@ -1257,16 +1250,292 @@
   border: 1px solid var(--assistant-message-border, #f0f0f0);
 }
 
-/* 编辑指令消息样式 */
 .edit-instruction-message {
   border: 1px solid var(--border-color, #e5e5e5);
   background-color: var(--bg-primary, #ffffff);
 }
 
-/* 结构化内容样式 */
+
 .structured-content {
   background-color: var(--assistant-message-bg, #ffffff);
   color: var(--text-primary, #262626);
   border: 1px solid var(--assistant-message-border, #f0f0f0);
 }
 
+
+
+.message-content:empty,
+.thinking-content-popup:empty,
+.structured-content:empty,
+.message-text:empty {
+   display: none;
+}
+ 
+
+.message-controls {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  gap: 4px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background-color: transparent; 
+  border-radius: 0;
+  padding: 2px;
+  box-shadow: none;
+}
+
+.direct-image-container {
+  background-color: transparent;
+  border-radius: 0; 
+  border: none;
+  box-shadow: none;
+}
+ 
+
+.assistant-message .direct-image-container {
+  background-color: transparent;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+  border: none;
+}
+
+
+
+.message, 
+.message.user-message, 
+.message.assistant-message,
+.user-message,
+.assistant-message {
+  padding: 0 !important;
+  margin-bottom: 8px !important;
+  max-width: 100% !important;
+  display: flex !important;
+  position: relative !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+
+.message-content,
+.message .message-content,
+.user-message .message-content,
+.assistant-message .message-content {
+  position: relative !important;
+  max-width: 100% !important;
+  border: none !important;
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+
+.message-text,
+.message .message-text,
+.user-message .message-text,
+.assistant-message .message-text {
+  padding: 8px 12px !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  color: inherit !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+.message-bubble,
+.message .message-bubble,
+.assistant-message .message-bubble {
+  position: relative !important;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  overflow: hidden !important;
+  width: 100% !important;
+}
+
+
+[class*="tool-execution-renderer"],
+.tool-execution-renderer,
+.tool-execution-container {
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+
+.direct-image-container,
+.assistant-message .direct-image-container {
+  background-color: transparent !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+.structured-content,
+.message .structured-content,
+.assistant-message .structured-content {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+
+.message-controls,
+.thinking-button-container,
+.message-info {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+.message-separator,
+.message-divider,
+[class*="divider"],
+[class*="separator"] {
+  display: none !important;
+}
+
+
+.message *[style*="background"],
+.message *[class*="background"],
+.message-text *[style*="background"],
+.message-text *[class*="background"] {
+  background-color: transparent !important;
+}
+
+
+
+
+
+
+
+.messages-container .message-list .message,
+.messages-container .message-list .assistant-message,
+.messages-container .message-list .user-message {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-bottom: 16px !important;
+  max-width: 100% !important;
+}
+
+
+.messages-container .message-list .message-content,
+.messages-container .message-list .message-text,
+.messages-container .message-list .markdown-content {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  color: #333 !important;
+}
+
+
+.messages-container .message-list .message-bubble,
+.messages-container .message-list .bubble-container,
+.messages-container .message-list .message-wrapper {
+  background-color: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+
+.messages-container .message-list .execution-plan {
+  display: block !important;
+  margin: 8px 0 !important;
+  border-radius: 8px !important; 
+  border: 1px solid #e6e6e6 !important;
+  overflow: hidden !important;
+  background-color: #f5f9ff !important;
+}
+
+.messages-container .message-list .execution-plan-header {
+  background-color: #e3f2fd !important;
+  padding: 8px 12px !important;
+  border-bottom: 1px solid #e1f0fc !important;
+}
+
+.messages-container .message-list .execution-plan-title {
+  color: #1677ff !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.messages-container .message-list .execution-plan-steps {
+  padding: 8px !important;
+}
+
+.messages-container .message-list .execution-step {
+  margin-bottom: 4px !important;
+  border-radius: 6px !important;
+  border: 1px solid #e6e6e6 !important;
+  background-color: white !important;
+  overflow: hidden !important;
+}
+
+.messages-container .message-list .execution-step-header {
+  padding: 6px 10px !important;
+  background-color: #f5f5f5 !important;
+}
+
+.messages-container .message-list .execution-step-title {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: #333 !important;
+}
+
+.messages-container .message-list .execution-step-tool {
+  font-size: 12px !important;
+  color: #666 !important;
+}
+
+.messages-container .message-list .execution-plan-final-output {
+  padding: 8px 12px !important;
+  background-color: #f0f7ff !important;
+  border-top: 1px solid #e1f0fc !important;
+}
+
+
+
+[data-theme="dark"] .messages-container .message-list .execution-plan,
+.theme-dark .messages-container .message-list .execution-plan {
+  background-color: #1e2a38 !important;
+  border-color: #39465a !important; 
+}
+
+[data-theme="dark"] .messages-container .message-list .execution-plan-header,
+.theme-dark .messages-container .message-list .execution-plan-header {
+  background-color: rgba(33, 150, 243, 0.15) !important;
+  border-color: #39465a !important;
+}
+
+[data-theme="dark"] .messages-container .message-list .execution-step,
+.theme-dark .messages-container .message-list .execution-step {
+  background-color: #2c3e50 !important;
+  border-color: #39465a !important;
+}
+
+[data-theme="dark"] .messages-container .message-list .execution-plan-final-output,
+.theme-dark .messages-container .message-list .execution-plan-final-output {
+  background-color: #2c3e50 !important;
+  border-color: #39465a !important;
+}

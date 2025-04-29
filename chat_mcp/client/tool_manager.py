@@ -2,14 +2,12 @@ import os
 import re
 import shutil
 import asyncio
-from typing import Dict, Any, Optional, List
-import Levenshtein
+from typing import Dict, Any
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from ..utils.get_logger import get_logger
 
-# 配置日志
 logging = get_logger("ToolManager")
 
 
@@ -24,8 +22,8 @@ class ToolManager:
         self.all_tools = []
         self.grouped_tools = {}
         self.similarity_threshold = similarity_threshold
-        self._tool_name_cache = {}  # 工具名称相似度缓存
-        self._tool_name_index = {}  # 工具名称查找索引
+        self._tool_name_cache = {}
+        self._tool_name_index = {}
 
     async def initialize_server(self, name: str, config: Dict[str, Any]):
         """
@@ -182,7 +180,7 @@ class ToolManager:
 
     def get_tools_json(self):
         """
-        获取JSON格式的工具信息，适用于前端展示
+        获取JSON格式的工具信息
         """
         result = {
             "groups": []

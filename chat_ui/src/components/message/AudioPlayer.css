@@ -12,7 +12,6 @@
   border: 1px solid #ffccc7;
 }
 
-/* 播放控制区域 */
 .audio-player-controls {
   display: flex;
   align-items: center;
@@ -70,7 +69,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 进度条容器 */
 .progress-container {
   flex-grow: 1;
   position: relative;
@@ -138,7 +136,6 @@
   cursor: not-allowed;
 }
 
-/* 错误消息样式 */
 .audio-error-message {
   display: flex;
   align-items: center;

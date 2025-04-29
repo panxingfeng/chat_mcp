@@ -60,7 +60,6 @@ async def get_tools():
 
     try:
         tools_data = mcp_client.get_tools_json()
-        # 检查返回的数据结构
         if isinstance(tools_data, dict) and "groups" in tools_data:
             return {
                 "return_code": 0,
@@ -224,10 +223,21 @@ async def chat_stream(request: Request):
                         temperature=temperature,
                         history_message=history_message
                 ):
-                    yield f"data: {json.dumps({'content': chunk})}\n\n"
+                    content = ""
+                    if hasattr(chunk, 'choices') and chunk.choices:
+                        choice = chunk.choices[0]
+                        if hasattr(choice, 'delta') and hasattr(choice.delta, 'content'):
+                            content = choice.delta.content or ""
+                    elif isinstance(chunk, str):
+                        content = chunk
+                    else:
+                        try:
+                            content = str(chunk)
+                        except:
+                            content = ""
+                    
+                    yield f"data: {json.dumps({'content': content})}\n\n"
                     await asyncio.sleep(0.02)
-
-                yield f"data: {json.dumps({'content': ''})}\n\n"
 
             except Exception as e:
                 error_msg = f"处理流式响应出错: {str(e)}"

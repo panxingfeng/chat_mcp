@@ -35,7 +35,7 @@
   opacity: 1;
 }
 
-/* 顶部栏样式 */
+
 .tools-panel-header {
   display: flex;
   justify-content: space-between;
@@ -78,7 +78,6 @@
   background-color: #eeeeee;
 }
 
-/* 内容区域样式 */
 .tools-panel-content {
   padding: 20px;
   flex-grow: 1;
@@ -86,7 +85,7 @@
   overflow-x: hidden;
 }
 
-/* 分组选择器样式 */
+
 .group-selector {
   display: flex;
   overflow-x: auto;
@@ -128,7 +127,7 @@
   border-color: #d0d0d0;
 }
 
-/* 分组标题 */
+
 .group-title {
   display: flex;
   align-items: center;
@@ -139,7 +138,7 @@
   text-align: center;
 }
 
-/* 工具网格布局 */
+
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(var(--tools-per-row, 3), 1fr);
@@ -223,7 +222,6 @@
   display: inline-block;
 }
 
-/* 加载和错误提示 */
 .tools-loading, .tools-error, .no-tools {
   text-align: center;
   padding: 32px;
@@ -260,7 +258,7 @@
   border: 1px solid #ffdddd;
 }
 
-/* 工具详情页样式 */
+
 .tool-args-form {
   display: flex;
   flex-direction: column;
@@ -297,7 +295,7 @@
   text-align: left;
 }
 
-/* 参数列表样式 */
+
 .args-list {
   margin-top: 20px;
   background-color: #f9f9f9;
@@ -349,7 +347,7 @@
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }
 
-/* 执行结果区域样式 */
+
 .execution-result {
   margin-top: 24px;
   border-top: 1px solid #eaeaea;
@@ -403,7 +401,7 @@
   content: '⚠️ ';
 }
 
-/* 底部按钮区域 */
+
 .tools-actions {
   display: flex;
   justify-content: flex-end;
@@ -446,7 +444,7 @@
   opacity: 0.8;
 }
 
-/* 设置面板样式 */
+
 .layout-settings {
   background-color: #f9f9f9;
   padding: 16px;
@@ -520,7 +518,7 @@
   background-color: #f5f5f5;
 }
 
-/* 自定义滚动条 */
+
 .tools-panel::-webkit-scrollbar,
 .tools-panel-content::-webkit-scrollbar,
 .result-content::-webkit-scrollbar,
@@ -552,19 +550,17 @@
   background: #a1a1a1;
 }
 
-/* 响应式调整 */
 @media (min-width: 901px) {
   :root:not([data-user-grid-set]) {
     --tools-per-row: 3;
   }
 
-  /* 确保三列布局下所有内容可见 */
   .tools-panel {
     min-width: 680px;
   }
 }
 
-/* 中等屏幕尺寸 */
+
 @media (max-width: 900px) and (min-width: 601px) {
   :root:not([data-user-grid-set]) {
     --tools-per-row: 2;
@@ -576,7 +572,6 @@
   }
 }
 
-/* 小屏幕尺寸 */
 @media (max-width: 600px) {
   .tools-panel {
     width: 95%;
@@ -617,7 +612,6 @@
   box-sizing: border-box;
 }
 
-/* 工具分类标题 */
 .all-tools .tools-title {
   font-size: 18px;
   color: #333;
@@ -625,7 +619,6 @@
   text-align: center;
 }
 
-/* 无工具状态 */
 .no-tools {
   background-color: #f9f9f9;
   padding: 30px;
@@ -637,7 +630,6 @@
 
 
 
-/* 通用样式 */
 .generic-content {
   background-color: #f9f9f9;
   border-radius: 8px;
@@ -655,7 +647,7 @@
   color: #333;
 }
 
-/* 天气卡片样式 */
+
 .weather-card {
   background-color: #f9f9f9;
   border-radius: 12px;
@@ -667,7 +659,6 @@
   position: relative;
 }
 
-/* 不同天气状况的背景色 */
 .weather-sunny {
   background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
   color: #333;
@@ -765,7 +756,7 @@
   font-weight: 500;
 }
 
-/* 搜索结果样式 */
+
 .search-results-container {
   background-color: white;
   border-radius: 12px;
@@ -840,7 +831,7 @@
   color: #999;
 }
 
-/* 聊天历史记录样式 */
+
 .chat-history-container {
   background-color: #f9f9f9;
   border-radius: 12px;
@@ -921,7 +912,7 @@
   margin: 4px 0;
 }
 
-/* 消息发送结果样式 */
+
 .message-sent-container {
   display: flex;
   align-items: flex-start;
@@ -992,7 +983,7 @@
   color: #666;
 }
 
-/* 智能内容渲染器样式 */
+
 .smart-result-container {
   margin-top: 10px;
   border-radius: 8px;
@@ -1000,7 +991,6 @@
   border: 1px solid #eee;
 }
 
-/* 执行结果容器样式调整 */
 .execution-result {
   margin-top: 24px;
   border-top: 1px solid #eaeaea;
@@ -1025,7 +1015,7 @@
   margin-right: 8px;
 }
 
-/* 响应式调整 */
+
 @media (max-width: 600px) {
   .weather-main {
     flex-direction: column;

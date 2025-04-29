@@ -24,7 +24,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 头部区域 */
+
 .ai-image-header {
   display: flex;
   justify-content: space-between;
@@ -55,7 +55,7 @@
   justify-content: center;
 }
 
-/* 主标签页 */
+
 .main-tabs {
   display: flex;
   border-bottom: 1px solid #f0f0f0;
@@ -91,7 +91,7 @@
   background-color: #1677ff;
 }
 
-/* 子标签页 */
+
 .sub-tabs {
   display: flex;
   border-bottom: 1px solid #f0f0f0;
@@ -130,7 +130,7 @@
   background-color: #1677ff;
 }
 
-/* 图标样式 */
+
 .icon-style,
 .icon-camera,
 .icon-lighting,
@@ -143,7 +143,7 @@
   background-size: contain;
 }
 
-/* 内容区域 */
+
 .content-section {
   flex: 1;
   overflow-y: auto;
@@ -159,7 +159,7 @@
   color: #333;
 }
 
-/* 风格网格 */
+
 .style-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -198,7 +198,6 @@
   border-top: 1px solid #f0f0f0;
 }
 
-/* 宽高比选项 */
 .aspect-ratio-options {
   display: flex;
   flex-wrap: wrap;
@@ -226,7 +225,7 @@
   border-color: #a3c9ff;
 }
 
-/* 尺寸输入 */
+
 .size-input-container {
   margin-top: 16px;
   margin-bottom: 20px;
@@ -265,7 +264,7 @@
   color: #888;
 }
 
-/* 选项网格 */
+
 .options-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -301,7 +300,7 @@
   color: #777;
 }
 
-/* 上传区域 */
+
 .upload-area {
   display: block;
   width: 100%;
@@ -346,7 +345,7 @@
   display: none;
 }
 
-/* 已上传图片和处理选项 */
+
 .image-processing-container {
   display: flex;
   flex-direction: column;
@@ -385,7 +384,7 @@
   font-size: 14px;
 }
 
-/* 图像处理选项按钮 */
+
 .image-options {
   display: flex;
   flex-wrap: wrap;
@@ -414,7 +413,7 @@
   border-color: #a3c9ff;
 }
 
-/* 图像加载和错误提示 */
+
 .image-loading {
   display: flex;
   flex-direction: column;
@@ -451,7 +450,6 @@
   border-radius: 4px;
 }
 
-/* 提示词区域 */
 .prompt-area {
   padding: 14px 16px;
   border-top: 1px solid #f0f0f0;
@@ -475,7 +473,7 @@
   line-height: 1.5;
 }
 
-/* 按钮区域 */
+
 .action-buttons {
   display: flex;
   justify-content: space-between;
@@ -498,7 +496,7 @@
   background-color: #f5f5f5;
 }
 
-/* 发送按钮样式*/
+
 .send-button {
   padding: 8px 16px;
   border-radius: 6px;
@@ -509,7 +507,6 @@
   font-size: 14px;
 }
 
-/* 发送按钮激活状态 */
 .send-button-active {
   padding: 8px 16px;
   border-radius: 6px;
@@ -525,7 +522,7 @@
   background-color: #0958d9;
 }
 
-/* 适配移动端 */
+
 @media (max-width: 480px) {
   .ai-image-container {
     max-width: 95vw;

@@ -77,7 +77,6 @@
   flex: 1;
 }
 
-/* 头像部分 */
 .avatar-section {
   display: flex;
   justify-content: center;
@@ -108,7 +107,7 @@
   height: 45px;
 }
 
-/* 设置组样式 */
+
 .setting-group {
   margin-bottom: 24px;
 }
@@ -180,7 +179,7 @@
   cursor: pointer;
 }
 
-/* 可折叠面板样式 */
+
 .collapsible-panel {
   border: 1px solid #f0f0f0;
   border-radius: 10px;
@@ -228,7 +227,7 @@
   background-color: #fff;
 }
 
-/* 提供商选择器样式 */
+
 .provider-selector {
   position: relative;
   width: 100%;
@@ -265,7 +264,6 @@
   transform: translateY(2px);
 }
 
-/* 提供商下拉菜单 */
 .provider-dropdown {
   position: absolute;
   top: calc(100% + 6px);
@@ -312,7 +310,7 @@
   color: #1677ff;
 }
 
-/* API地址输入组 */
+
 .endpoint-input-group {
   display: flex;
   gap: 8px;
@@ -360,7 +358,6 @@
   text-decoration: underline;
 }
 
-/* 滑块样式 */
 .slider-container {
   display: flex;
   align-items: center;
@@ -411,7 +408,7 @@
   box-shadow: 0 0 8px rgba(24, 144, 255, 0.5);
 }
 
-/* 轨道样式 */
+
 .slider::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 4px;
@@ -424,7 +421,7 @@
   background: linear-gradient(to right, #1677ff 0%, #1677ff var(--slider-percent, 50%), #e6f4ff var(--slider-percent, 50%), #e6f4ff 100%);
 }
 
-/* 数值输入框样式 */
+
 .slider-value-input {
   width: 80px;
   height: 40px;
@@ -442,7 +439,7 @@
   box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
-/* 底部按钮区域 */
+
 .chat-settings-footer {
   display: flex;
   justify-content: flex-end;
@@ -483,7 +480,7 @@
   box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
 }
 
-/* 响应式调整 */
+
 @media (max-width: 768px) {
   .chat-settings-container {
     width: 100%;

@@ -70,7 +70,7 @@
   -webkit-box-orient: vertical;
 }
 
-/* 加载中动画 */
+
 .loading-spinner {
   width: 20px;
   height: 20px;
@@ -87,7 +87,7 @@
   }
 }
 
-/* 全屏模态框 */
+
 .file-modal-overlay {
   position: fixed;
   top: 0;
@@ -157,7 +157,7 @@
   color: #333;
 }
 
-/* 响应式调整 */
+
 @media (max-width: 768px) {
   .file-modal-container {
     width: 95%;

@@ -7,7 +7,6 @@
   position: relative;
 }
 
-/* 代码容器样式 */
 .mermaid-with-buttons .code-container {
   position: relative;
   overflow: hidden;
@@ -19,7 +18,6 @@
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
 }
 
-/* 按钮容器样式 */
 .mermaid-with-buttons .buttons-container {
   position: absolute;
   top: 8px;
@@ -31,12 +29,11 @@
   transition: opacity 0.2s ease-in-out;
 }
 
-/* 鼠标悬停时显示按钮 */
 .mermaid-with-buttons:hover .buttons-container {
   opacity: 1;
 }
 
-/* 按钮基础样式 */
+
 .mermaid-with-buttons .code-button {
   display: flex;
   align-items: center;
@@ -52,7 +49,6 @@
   white-space: nowrap;
 }
 
-/* 复制按钮 */
 .mermaid-with-buttons .copy-button {
   background-color: rgba(36, 41, 47, 0.8);
 }
@@ -65,7 +61,6 @@
   background-color: #2cbe4e;
 }
 
-/* 渲染按钮 */
 .mermaid-with-buttons .render-button {
   background-color: rgba(0, 92, 197, 0.8);
 }
@@ -82,8 +77,7 @@
   background-color: rgba(88, 166, 255, 0.5);
   cursor: not-allowed;
 }
-
-/* 错误显示样式 */
+、
 .mermaid-with-buttons .render-error {
   padding: 12px 16px;
   background-color: rgba(248, 81, 73, 0.15);
@@ -114,7 +108,7 @@
   word-break: break-word;
 }
 
-/* 渲染结果容器 */
+
 .mermaid-with-buttons .render-result {
   height: 0;
   overflow: hidden;
@@ -131,13 +125,13 @@
   align-items: center;
 }
 
-/* Mermaid渲染容器 */
+
 .mermaid-with-buttons .mermaid-render-container {
   width: 100%;
   overflow-x: auto;
 }
 
-/* 适应暗色主题 */
+
 @media (prefers-color-scheme: dark) {
   .mermaid-with-buttons {
     border-color: #30363d;
@@ -165,7 +159,7 @@
   }
 }
 
-/* 移动端适配 */
+
 @media (max-width: 768px) {
   .mermaid-with-buttons .buttons-container {
     opacity: 1;

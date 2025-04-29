@@ -191,7 +191,7 @@
   color: white;
 }
 
-/* 创建搭档表单样式 */
+
 .create-partner-form {
   padding: 20px;
 }
@@ -543,14 +543,13 @@
   }
 }
 
-/* 返回按钮容器样式 */
+
 .header-left {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-/* 返回按钮基本样式 */
 .back-button {
   background: none;
   border: none;
@@ -567,19 +566,19 @@
   margin-right: 4px;
 }
 
-/* 返回按钮悬停效果 */
+
 .back-button:hover {
   background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
   color: var(--text-primary, #333);
 }
 
-/* 返回按钮激活效果 */
+
 .back-button:active {
   background-color: var(--bg-active, rgba(0, 0, 0, 0.1));
   transform: scale(0.95);
 }
 
-/* 在暗色主题下的按钮样式 */
+
 .theme-dark .back-button {
   color: var(--text-secondary, #aaa);
 }
@@ -589,19 +588,17 @@
   color: var(--text-primary, #eee);
 }
 
-/* 在手机端增大返回按钮的点击区域 */
+
 @media (max-width: 768px) {
   .back-button {
     width: 40px;
     height: 40px;
   }
 
-  /* 调整标题与返回按钮的间距 */
   .header-left {
     gap: 8px;
   }
 
-  /* 增加设置标题的左边距 */
   .settings-header h2,
   .partner-settings-header h2 {
     margin-left: 4px;

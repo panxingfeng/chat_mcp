@@ -11,7 +11,7 @@ body {
   height: 100vh;
 }
 
-/* 应用容器 */
+
 .chat-app {
   display: flex;
   width: 100%;
@@ -20,7 +20,7 @@ body {
   overflow: hidden;
 }
 
-/* 聊天区域样式 */
+
 .chat-container {
   flex: 1;
   margin-left: 260px;
@@ -37,7 +37,7 @@ body {
   width: 100%;
 }
 
-/* 头部样式 */
+
 .header {
   padding: 16px 20px;
   background-color: #fff;
@@ -98,7 +98,7 @@ body {
   color: #333;
 }
 
-/* 下拉菜单样式 */
+
 .dropdown-menu {
   position: absolute;
   top: 40px;
@@ -139,7 +139,7 @@ body {
   background-color: #fff5f5;
 }
 
-/* 消息容器样式 */
+
 .messages-container {
   flex: 1;
   overflow-y: auto;
@@ -148,7 +148,7 @@ body {
   width: 100%;
 }
 
-/* 欢迎界面样式 */
+
 .welcome-container {
   display: flex;
   flex-direction: column;
@@ -210,7 +210,6 @@ body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
-/* 消息列表样式 */
 .message-list {
   display: flex;
   flex-direction: column;
@@ -219,7 +218,7 @@ body {
   width: 100%;
 }
 
-/* 消息样式 */
+
 .message {
   display: flex;
   gap: 16px;
@@ -299,7 +298,6 @@ body {
   border-top-left-radius: 4px;
 }
 
-/* 加载指示器样式 */
 .loading-indicator {
   padding: 12px;
   align-self: flex-start;
@@ -343,7 +341,8 @@ body {
   }
 }
 
-/* 聊天输入区样式 */
+
+
 .chat-input-container {
   padding: 16px;
   background-color: transparent;
@@ -437,7 +436,8 @@ body {
   cursor: not-allowed;
 }
 
-/* 响应式设计 */
+
+
 @media (max-width: 768px) {
   .chat-container {
     margin-left: 0 !important;
@@ -453,14 +453,13 @@ body {
     max-width: 90%;
   }
 
-  /* 大屏幕下隐藏侧边栏切换按钮 */
+  
   @media (min-width: 769px) {
     .sidebar-toggle.hide-on-large {
       display: none;
     }
   }
 
-  /* 小屏幕下始终显示侧边栏切换按钮 */
   @media (max-width: 768px) {
     .sidebar-toggle {
       display: flex !important;
@@ -468,7 +467,6 @@ body {
   }
 }
 
-/* 确保滚动条样式一致 */
 ::-webkit-scrollbar {
   width: 6px;
 }

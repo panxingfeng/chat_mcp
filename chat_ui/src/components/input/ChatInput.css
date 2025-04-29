@@ -80,7 +80,7 @@
   cursor: not-allowed;
 }
 
-/* 模态框样式 */
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -294,7 +294,7 @@
   font-size: 14px;
 }
 
-/* 响应式适配 */
+
 @media (max-width: 768px) {
   .chat-input-container {
     padding: 8px;
@@ -323,7 +323,7 @@
 }
 
 
-/* 预览区域容器 */
+
 .preview-area {
   padding: 10px;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
@@ -335,21 +335,21 @@
   overflow-y: auto;
 }
 
-/* 图片预览容器 */
+
 .image-previews {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-/* 文件预览容器 */
+
 .file-previews {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-/* 预览项目样式 */
+
 .preview-item {
   position: relative;
   width: 120px;
@@ -366,7 +366,7 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
-/* 图片容器 */
+
 .preview-image-container {
   position: relative;
   width: 120px;
@@ -380,7 +380,7 @@
   object-fit: cover;
 }
 
-/* 文件项目特殊样式 */
+
 .file-item {
   display: flex;
   align-items: center;
@@ -395,7 +395,7 @@
   color: #1677ff;
 }
 
-/* 预览信息 */
+
 .preview-info {
   padding: 6px;
   font-size: 12px;
@@ -419,7 +419,7 @@
   margin-top: 2px;
 }
 
-/* 移除按钮 */
+
 .remove-preview {
   position: absolute;
   top: 4px;
@@ -445,7 +445,7 @@
   opacity: 1;
 }
 
-/* 文件项目的删除按钮位置调整 */
+
 .file-item .remove-preview {
   position: static;
   margin-left: auto;
@@ -457,7 +457,7 @@
   color: #ff4d4f;
 }
 
-/* 响应式适配 */
+
 @media (max-width: 640px) {
   .preview-item {
     width: 100px;
@@ -475,7 +475,7 @@
 
 
 
-/* 处理中标签样式 */
+
 .processing-badge {
   font-size: 12px;
   background-color: #ff9800;
@@ -487,14 +487,14 @@
   font-weight: normal;
 }
 
-/* 处理中动画 */
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-/* 图片处理中状态 */
+
 .image-loading {
   width: 100%;
   height: 100%;
@@ -525,7 +525,6 @@
   color: #555;
 }
 
-/* 文件处理中状态 */
 .file-loading {
   display: flex;
   align-items: center;
@@ -546,12 +545,11 @@
   white-space: nowrap;
 }
 
-/* 处理中的文件项样式 */
+
 .file-item.processing {
   background-color: rgba(255, 248, 230, 0.5);
 }
 
-/* 处理中的图片项样式 */
 .preview-item.processing {
   border-color: #ff9800;
 }
@@ -640,7 +638,7 @@
   cursor: not-allowed;
 }
 
-/* 预览区域相关样式 */
+
 .preview-area {
   padding: 10px;
   border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
@@ -652,7 +650,7 @@
   overflow-y: auto;
 }
 
-/* 预览项目样式 */
+
 .preview-item {
   position: relative;
   width: 120px;
@@ -678,7 +676,7 @@
   margin-top: 2px;
 }
 
-/* 图片处理中状态 */
+
 .image-loading {
   width: 100%;
   height: 100%;
@@ -699,14 +697,14 @@
   color: var(--text-secondary, #555);
 }
 
-/* 文件处理中状态 */
+
 .file-loading span {
   font-size: 12px;
   color: var(--text-secondary, #555);
   white-space: nowrap;
 }
 
-/* 模态框样式 */
+
 .modal {
   background-color: var(--bg-primary, #fff);
   border-radius: 8px;

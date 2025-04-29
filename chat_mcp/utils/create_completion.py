@@ -1,6 +1,5 @@
 import asyncio
 
-
 async def create_stream_completion(llm_client, logger, model,**kwargs):
     """创建流式完成，返回一个异步生成器"""
     try:

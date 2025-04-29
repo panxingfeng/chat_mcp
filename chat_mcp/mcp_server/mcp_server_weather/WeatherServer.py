@@ -268,7 +268,7 @@ async def serve(api_key: str = None):
         return [
             Tool(
                 name="get_weather",
-                description="查询指定城市的天气信息",
+                description="查询指定城市的天气信息,返回的内容是格式化后的结果",
                 inputSchema={
                     "type": "object",
                     "properties": {
@@ -291,7 +291,7 @@ async def serve(api_key: str = None):
                             "items": {
                                 "type": "string"
                             },
-                            "description": "城市名称列表（支持中文，如['北京', '上海', '广州']）",
+                            "description": "城市名称列表（支持中文，如['北京', '上海', '广州']）,返回的内容是格式化后的结果",
                         }
                     },
                     "required": ["cities"],
@@ -330,9 +330,9 @@ async def serve(api_key: str = None):
                 for city in cities:
                     weather_data = await weather_server.fetch_weather(city)
                     weather_text = weather_server.format_weather(weather_data)
-                    weather_results.append(f"\n{'-' * 30}\n{weather_text}")
+                    weather_results.append(f"\n{weather_text}")
 
-                combined_result = f"📊 多城市天气查询结果 (共{len(cities)}个城市)\n" + "\n".join(weather_results)
+                combined_result = f"多城市天气查询结果\n" + "\n".join(weather_results)
 
                 return [TextContent(type="text", text=combined_result)]
 

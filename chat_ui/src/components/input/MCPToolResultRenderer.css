@@ -1,4 +1,3 @@
-/* 通用样式 */
 .generic-content {
   background-color: #f9f9f9;
   border-radius: 8px;
@@ -16,7 +15,7 @@
   color: #333;
 }
 
-/* 天气卡片样式 */
+
 .weather-card {
   background-color: #f9f9f9;
   border-radius: 12px;
@@ -28,7 +27,6 @@
   position: relative;
 }
 
-/* 不同天气状况的背景色 */
 .weather-sunny {
   background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
   color: #333;
@@ -126,7 +124,7 @@
   font-weight: 500;
 }
 
-/* 搜索结果样式 */
+
 .search-results-container {
   background-color: white;
   border-radius: 12px;
@@ -201,7 +199,7 @@
   color: #999;
 }
 
-/* 聊天历史记录样式 */
+
 .chat-history-container {
   background-color: #f9f9f9;
   border-radius: 12px;
@@ -282,7 +280,7 @@
   margin: 4px 0;
 }
 
-/* 消息发送结果样式 */
+
 .message-sent-container {
   display: flex;
   align-items: flex-start;
@@ -353,7 +351,7 @@
   color: #666;
 }
 
-/* 响应式调整 */
+
 @media (max-width: 600px) {
   .weather-main {
     flex-direction: column;
@@ -378,7 +376,10 @@
 }
 
 
-/* URL渲染器样式 */
+
+
+
+
 .url-info-container {
   background-color: white;
   border-radius: 12px;
@@ -429,7 +430,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 不同类型的URL项样式 */
+
 .url-type-audio {
   border-left: 4px solid #ff7043;
 }
@@ -481,7 +482,7 @@
   width: 100%;
 }
 
-/* 图片预览 */
+
 .image-preview {
   width: 100%;
   max-height: 200px;
@@ -499,7 +500,7 @@
   object-fit: contain;
 }
 
-/* 音频预览 */
+
 .audio-preview {
   width: 100%;
   padding: 10px;
@@ -511,7 +512,7 @@
   width: 100%;
 }
 
-/* 视频预览 */
+
 .video-preview {
   width: 100%;
   max-height: 300px;
@@ -526,7 +527,7 @@
   object-fit: contain;
 }
 
-/* 文件和链接按钮 */
+
 .file-download-button,
 .link-button {
   display: inline-flex;
@@ -571,7 +572,7 @@
   text-decoration: underline;
 }
 
-/* 响应式调整 */
+
 @media (max-width: 600px) {
   .url-item {
     flex-direction: column;
@@ -599,7 +600,10 @@
 
 
 
-/* 多城市天气容器 */
+
+
+
+
 .weather-multi-city-container {
   background-color: white;
   border-radius: 12px;
@@ -630,7 +634,7 @@
   font-weight: normal;
 }
 
-/* 天气卡片网格布局 */
+
 .weather-city-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -638,7 +642,7 @@
   padding: 20px;
 }
 
-/* 单个天气卡片样式调整 */
+
 .weather-city-grid .weather-card {
   margin: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -646,7 +650,7 @@
   min-height: 200px;
 }
 
-/* 响应式布局 */
+
 @media (max-width: 640px) {
   .weather-city-grid {
     grid-template-columns: 1fr;
@@ -667,7 +671,7 @@
   }
 }
 
-/* 确保天气卡片在网格中的高度一致 */
+
 .weather-city-grid .weather-main {
   min-height: 80px;
 }
@@ -677,7 +681,7 @@
 }
 
 
-/* 沙箱容器样式 */
+
 .sandbox-container {
   background-color: white;
   border-radius: 12px;
@@ -752,7 +756,7 @@
   word-break: break-all;
 }
 
-/* 响应式设计 */
+
 @media (max-width: 768px) {
   .sandbox-iframe-container {
     height: 400px;
