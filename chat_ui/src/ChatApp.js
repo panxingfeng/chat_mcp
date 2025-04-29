@@ -123,11 +123,9 @@ function ChatApp() {
       if (appData.conversations && appData.conversations.length > 0) {
         setConversations(appData.conversations);
         
-        // 直接使用保存的当前对话ID，不自动跳转到非空对话
         if (appData.currentConversation) {
           setCurrentConversation(appData.currentConversation);
           
-          // 加载当前会话的消息
           const conversation = appData.conversations.find(
             conv => conv.id === appData.currentConversation
           );
@@ -137,7 +135,6 @@ function ChatApp() {
             setMessages([]);
           }
         } else {
-          // 如果没有当前对话ID，使用第一个对话
           const firstConversation = appData.conversations[0];
           setCurrentConversation(firstConversation.id);
           setMessages(firstConversation.messages || []);

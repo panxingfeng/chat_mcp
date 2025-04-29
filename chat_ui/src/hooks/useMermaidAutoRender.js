@@ -54,7 +54,6 @@ export function useMermaidAutoRender(isComplete, messageId) {
 
             console.log(`检查代码块 #${index+1}，长度: ${trimmedCode.length}`);
 
-            // 检测是否为Mermaid代码
             const mermaidPatterns = [
               /^graph\s/i,
               /^flowchart\s/i,

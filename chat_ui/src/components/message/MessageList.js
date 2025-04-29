@@ -64,7 +64,7 @@ const MessageList = memo(function MessageList({
 
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container;
-      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50; // 接近底部的阈值
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 50;
 
       const scrollingDown = scrollTop > lastScrollTop;
 

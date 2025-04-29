@@ -69,7 +69,7 @@ function ChatInput({ onSendMessage, disabled, openChatSettings, settings, conver
         }
       };
 
-      onSendMessage(messageObject, false, chatSettings);  // 移除isConnected参数
+      onSendMessage(messageObject, false, chatSettings);
 
       setMessage('');
       setImageFiles([]);
@@ -347,25 +347,6 @@ function ChatInput({ onSendMessage, disabled, openChatSettings, settings, conver
         setShowLinkModal(false);
       }
     }
-  };
-
-  // 处理任务执行
-  const handleScheduleTask = (task) => {
-    // 创建任务消息对象
-    const messageObject = {
-      id: Date.now().toString(),
-      content: `【计划任务】${task.name || '无标题任务'}\n\n${task.content}`, // 添加【计划任务】前缀
-      userId: userId,
-      conversationId: conversationId,
-      timestamp: new Date().toISOString(),
-      model: {
-        name: chatSettings.model,
-        provider: chatSettings.apiProvider
-      }
-    };
-
-    // 发送消息
-    onSendMessage(messageObject, false, chatSettings);
   };
 
   const handleOpenSettings = () => {

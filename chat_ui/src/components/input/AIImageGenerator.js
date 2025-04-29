@@ -138,7 +138,6 @@ const AIImageGenerator = ({ onClose, onSendRequest, userId }) => {
 
   const handleCustomSizeChange = (e) => {
     const value = e.target.value;
-    // 只允许输入数字
     if (/^\d*$/.test(value)) {
       setCustomSize(value);
     }
@@ -248,7 +247,6 @@ const AIImageGenerator = ({ onClose, onSendRequest, userId }) => {
     let imageFile = null;
   
     if (mainTab === 'generate') {
-      // 添加宽高比信息到提示词中
       const aspectRatioText = aspectRatioOptions.find(ratio => ratio.id === selectedAspectRatio)?.name || '1:1 方形';
       messageContent = `AI生图：${prompt}，宽高比：${aspectRatioText}`;
   

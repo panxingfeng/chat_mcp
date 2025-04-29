@@ -539,7 +539,6 @@ class MCPClient:
     """
         
         try:
-            # 初始化LLM客户端(如果尚未初始化)
             if not self.llm_client:
                 self.llm_client = OpenAI(api_key=self.api_key, base_url=self.base_url)
             

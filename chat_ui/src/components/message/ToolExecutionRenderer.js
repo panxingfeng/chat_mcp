@@ -171,40 +171,32 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
       .replace(/\bnull\b/g, '<span class="json-null">null</span>');
   };
 
-  // 过滤掉特定提示语
   const filterPromptText = (text) => {
     if (!text || typeof text !== 'string') return text;
 
-    // 过滤掉"问题已完全解决，将生成"等提示语
     return text.replace(/问题已完全解决，将生成.*?(?=\n|$)/g, '')
                .trim();
   };
 
-  // 检测是否为执行计划格式
   const isExecutionPlan = (text) => {
       if (!text || typeof text !== 'string') return false;
       
-      // 同时支持两种格式的标题
       const hasPlanTitle = text.includes("**执行计划:") || text.includes("执行计划:");
       
-      // 同时支持中文方括号和英文方括号
       const hasStepPattern = /\d+\.\s*(?:\[|【)(□|✓|✗)(?:\]|】)/.test(text);
       
       return hasPlanTitle && hasStepPattern;
   };
 
-  // 解析执行计划数据
   const parseExecutionPlan = (content) => {
     if (!content || typeof content !== 'string') return null;
   
-    // 提取计划标题和创建时间
     const planTitleMatch = content.match(/\*\*执行计划:\s*(.*?)\*\*/);
     const planTitle = planTitleMatch ? planTitleMatch[1].trim() : "执行计划";
     
     const createTimeMatch = content.match(/\*\*创建时间:\s*(.*?)\*\*/);
     const createTime = createTimeMatch ? createTimeMatch[1].trim() : "";
     
-    // 查找所有步骤
     const stepRegex = /(\d+)\.\s*\[(□|✓|✗)\]\s*(.*?)\s*\(ID:\s*(.*?)\)\s*工具:\s*(.*?)\s*参数:\s*(\{.*?\})/g;
     const steps = [];
     let match;
@@ -220,7 +212,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
       });
     }
     
-    // 查找所有执行结果
     const executionResults = [];
     const executionRegex = /执行步骤\s+(.*?)\s+\((.*?)\)\s+:\s+(成功|失败)\s+结果:\s+(.*?)(?=执行步骤|$)/gs;
   
@@ -233,7 +224,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
       const status = match[3].trim();
       const resultContent = match[4].trim();
       
-      // 解析元数据和内容
       const metaContentMatch = resultContent.match(/meta=(None|null)\s+content=\[([\s\S]*?)\]\s+isError=(False|True)/s);
       let resultText = resultContent;
       let isError = false;
@@ -250,7 +240,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
         isError = metaContentMatch[3] === 'True';
       }
       
-      // 提取评估信息
       const assessmentMatch = resultContent.match(/评估:\s+满足度:\s+(.*?)\s+\(置信度:\s+(.*?)\)\s+原因:\s+(.*?)(?=执行步骤|$)/s);
       let assessment = null;
       
@@ -262,7 +251,9 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
         };
   
         if (assessment.reason && finalOutput && assessment.reason.includes(finalOutput)) {
-          assessment.reason = assessment.reason.replace("最终结果:" + finalOutput, '').trim();
+          const escapedOutput = finalOutput.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(`最终结果:\\s*${escapedOutput}`, 'g');
+          assessment.reason = assessment.reason.replace(regex, '').trim();
         }
       }
   
@@ -285,7 +276,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
     };
   };
   
-  // 渲染执行计划界面
   const renderExecutionPlan = (planData) => {
     return (
       <div className="execution-plan">
@@ -406,7 +396,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
         </div>
         {planData.finalOutput && (
           <div className="execution-plan-final-output">
-            {/* <div className="execution-section-title">最终结果</div> */}
             <div className="execution-final-content">
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, [remarkMath, {singleDollar: true}]]}
@@ -426,10 +415,8 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
   const parseContent = (text) => {
     if (!text || typeof text !== 'string') return [{ type: 'text', content: '' }];
 
-    // 过滤掉提示语
     text = filterPromptText(text);
 
-    // 检查是否为执行计划格式
     if (isExecutionPlan(text)) {
       return [{ type: 'execution-plan', content: text }];
     }
@@ -455,10 +442,8 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
   const parseContentParts = (text) => {
     const parts = [];
 
-    // 过滤掉提示语
     text = filterPromptText(text);
 
-    // 简化：只关注工具执行和结果，移除评估部分
     const toolExecPattern = /执行工具[:：]\s*([^\s,，\n]+)(?:\s|$)/g;
     
     const toolMatches = Array.from(text.matchAll(toolExecPattern));
@@ -524,7 +509,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
           if (afterMetaEndIndex < nextIndex) {
             const afterMetaText = text.substring(afterMetaEndIndex, nextIndex).trim();
 
-            // 移除评估相关内容
             const cleanText = afterMetaText.replace(/工具结果评估.*?(是否需要执行其他工具:.*?)(?=\n|$)/gs, '');
             if (cleanText.trim()) {
               parts.push({
@@ -538,7 +522,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
           const resultText = text.substring(afterCommandIndex, nextIndex).trim();
 
           if (resultText) {
-            // 移除评估相关内容
             const cleanText = resultText.replace(/工具结果评估.*?(是否需要执行其他工具:.*?)(?=\n|$)/gs, '');
             
             if (cleanText.trim()) {
@@ -585,7 +568,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
 
     if (lastEndIndex < text.length) {
       const finalText = text.substring(lastEndIndex).trim();
-      // 移除评估相关内容
       const cleanText = finalText.replace(/工具结果评估.*?(是否需要执行其他工具:.*?)(?=\n|$)/gs, '');
       if (cleanText.trim()) {
         parts.push({
@@ -601,7 +583,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
   const processContent = (content) => {
     if (!content) return { type: 'text', content: '' };
     
-    // 过滤掉提示语
     content = filterPromptText(content);
     
     const extractImageUrls = (text) => {
@@ -687,7 +668,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
     return { type: 'text', content };
   };
 
-  // 渲染工具执行动画
   const ToolExecutingAnimation = ({ toolName }) => (
     <div className="tool-executing-animation">
       <span>{toolName} 工具执行中</span>
@@ -701,22 +681,19 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
 
   const contentParts = parseContent(content);
   
-  // 创建工具执行状态映射
   const executingToolsMap = {};
   contentParts.forEach(part => {
     if (part.type === 'tool-result' && part.toolName) {
-      executingToolsMap[part.toolName] = false; // 如果有结果，则不在执行中
+      executingToolsMap[part.toolName] = false;
     }
   });
   
-  // 找出正在执行中但没有结果的工具
   Object.keys(executingTools).forEach(toolName => {
     if (executingTools[toolName] && !(toolName in executingToolsMap)) {
       executingToolsMap[toolName] = true;
     }
   });
 
-  // 渲染折叠/展开图标组件
   const CollapsibleIcon = ({ isCollapsed, onClick }) => (
     <div
       className="collapsible-icon"
@@ -846,7 +823,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
         key={`tool-execution-${renderKey}`}
       >
         {contentParts.map((part, index) => {
-          // 处理执行计划类型
           if (part.type === 'execution-plan') {
             const planData = parseExecutionPlan(part.content);
             if (!planData) {
@@ -1099,7 +1075,6 @@ const ToolExecutionRenderer = memo(function ToolExecutionRenderer({ content, mar
           return null;
         })}
         
-        {/* 渲染正在执行中的工具动画 */}
         {Object.entries(executingToolsMap).map(([toolName, isExecuting]) => 
           isExecuting ? (
             <ToolExecutingAnimation key={`executing-${toolName}`} toolName={toolName} />

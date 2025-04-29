@@ -172,7 +172,6 @@
   cursor: not-allowed;
 }
 
-/* 设置模态框样式 */
 .chat-settings-modal {
   padding: 0;
   overflow: hidden;
@@ -230,7 +229,6 @@
   margin-top: 24px;
 }
 
-/* 滑块样式 */
 .slider-container {
   margin: 24px 0;
 }

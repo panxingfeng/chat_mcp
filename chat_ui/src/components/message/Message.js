@@ -638,7 +638,7 @@ function Message({ message, isStreaming = false, isNew = false,onSendMessage, on
           loading="lazy"
           onError={(e) => {
             console.error('Image failed to load:', e.target.src);
-            e.target.onerror = null; // 防止无限循环
+            e.target.onerror = null;
             e.target.style.display = 'none';
 
             const errorSpan = document.createElement('span');

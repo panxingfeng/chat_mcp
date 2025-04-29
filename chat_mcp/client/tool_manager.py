@@ -46,7 +46,7 @@ class ToolManager:
             )
 
             try:
-                async with asyncio.timeout(30):  # 30秒超时
+                async with asyncio.timeout(30):
                     stdio_context = stdio_client(server_params)
                     read, write = await stdio_context.__aenter__()
                     session = ClientSession(read, write)

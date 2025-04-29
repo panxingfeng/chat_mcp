@@ -18,7 +18,6 @@ app = FastAPI()
 
 logging = get_logger(service="main")
 
-# 配置CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
