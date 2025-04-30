@@ -199,7 +199,6 @@ class WeatherServer:
         格式化天气信息
         """
         lives = weather_data.get("lives", [{}])[0]
-        province = lives.get("province", "未知")
         city = lives.get("city", "未知")
         weather = lives.get("weather", "未知")
         temperature = f"{lives.get('temperature', '未知')}℃"
@@ -212,14 +211,7 @@ class WeatherServer:
             content = f"{icon} {label}: {value}"
             return content
 
-        return f"""天气信息
-{format_line("📍", "位置", f"{province} {city}")}
-{format_line("🌤", "天气", weather)}
-{format_line("🌡", "温度", temperature)}
-{format_line("💨", "风向", winddirection)}
-{format_line("💪", "风力", windpower)}
-{format_line("💧", "湿度", humidity)}
-{format_line("🕒", "发布时间", reporttime)}"""
+        return f"{city}天气信息,天气{weather},温度:{temperature},风向:{winddirection},风力:{windpower},湿度:{humidity},发布时间:{reporttime}"
 
     def format_weather(self, data: dict[str, Any] | str) -> str:
         """

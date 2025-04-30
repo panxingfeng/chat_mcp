@@ -1,5 +1,6 @@
 import os
 import asyncio
+import re
 import shutil
 import json
 from datetime import datetime
@@ -11,6 +12,7 @@ from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent, ImageContent, EmbeddedResource
 from mcp.shared.exceptions import McpError
 from gradio_client import Client, handle_file
+from openai import OpenAI
 
 from config.config import CHARACTER_AUDIO_MAP, CURRENT_DIR, DEFAULT_OUTPUT_DIR, DEFAULT_SERVER_URL, URL_PORT
 from chat_mcp.utils.get_logger import get_logger
@@ -21,10 +23,17 @@ OUTPUT_DIR = os.path.join(CURRENT_DIR, DEFAULT_OUTPUT_DIR)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 class AudioGenerator:
-    def __init__(self, server_url: str = None) -> None:
+    def __init__(self, 
+                 server_url: str = None,
+                 llm_url: str="http://localhost:11434/v1",
+                 llm_key: str = "ollama",
+                 model: str = "qwen2.5") -> None:
         """初始化音频生成器
         """
         self.server_url = server_url or DEFAULT_SERVER_URL
+        self.llm_url=llm_url
+        self.llm_key=llm_key
+        self.model=model
         self.logger = get_logger(service="AudioGenerator")
 
     async def init_client(self) -> Client | None:
@@ -59,6 +68,64 @@ class AudioGenerator:
                 raise
 
         return _client
+
+    async def clean_data(self, text: str) -> str:          
+        try:
+            llm_client = OpenAI(api_key=self.llm_key, base_url=self.llm_url)
+            
+            cleaning_prompt = """请清理以下文本，使其更适合语音合成使用:
+
+    清理规则:
+    1. 彻底移除所有Markdown格式和特殊符号:
+    - 删除所有Markdown语法标记(如#, *, **, -, >, [], (), ``)
+    - 删除所有HTML标签(<br>, <p>等)
+    - 删除ASCII艺术字符和特殊装饰符号
+    - 删除所有表情符号和emoji
+    - 删除重复的标点符号
+    - 简化省略号为"..."
+    - 将\\n转换为适当的空格或段落分隔
+
+    2. 规范化文本布局:
+    - 规范化空格和换行
+    - 将列表符号转换为自然语言表达
+    - 保留段落结构，但删除不必要的空行
+
+    3. 处理特殊格式:
+    - 移除粗体、斜体、下划线等格式标记
+    - 将表格和代码块转换为简单文本
+    
+    4. 文本自然化:
+    - 确保句子结构完整
+    - 移除无意义的字符重复
+    - 修复明显的拼写和语法错误
+
+    请输出完全清理后的纯文本，不保留任何格式标记、特殊符号或排版元素。"""
+            
+            messages = [
+                {"role": "system", "content": "你是一个专业的文本清理助手，擅长优化文本使其适合语音合成。"},
+                {"role": "user", "content": f"{cleaning_prompt}\n\n原始文本:\n{text}"}
+            ]
+
+            response = llm_client.chat.completions.create(
+                model=self.model,
+                messages=messages,
+                temperature=0.1
+            )
+
+            content = response.choices[0].message.content
+        
+            content = re.sub(r'[#*`_~<>{}[\]()|-]', ' ', content)
+            content = re.sub(r'\s+', ' ', content)
+            content = re.sub(r'\n\s*\n', '\n\n', content)
+            content = re.sub(r'\n(?!\n)', ' ', content)
+            content = re.sub(r'https?://\S+', '', content)
+            content = content.strip()
+            
+            return content
+            
+        except Exception as e:
+            print(f"LLM调用错误: {str(e)}")
+            return f"清理文本时出错: {str(e)}"
 
     async def process_audio(self, audio_file_path: str, text_prompt: str) -> Dict[str, Any]:
         """处理音频生成过程"""
@@ -121,6 +188,11 @@ class AudioGenerator:
         """
         使用指定角色音色生成音频
         """
+        try:
+            text = await self.clean_data(text_prompt)
+        except:
+            print("ollama服务器未启动或者ollama执行出错，使用原始文本")
+            text = text_prompt
         audio_file_path = CHARACTER_AUDIO_MAP.get(speech_character)
 
         if not audio_file_path:
@@ -131,7 +203,7 @@ class AudioGenerator:
             error_msg = f"错误：音频文件不存在: {audio_file_path}"
             print(error_msg)
             return error_msg
-        result = await self.process_audio(audio_file_path, text_prompt)
+        result = await self.process_audio(audio_file_path, text)
 
         if result["success"]:
             success_msg = f"音频url地址:http://localhost:{URL_PORT}/static/{result['file_name']}"
@@ -142,10 +214,13 @@ class AudioGenerator:
             return error_msg
 
 
-async def serve(server_url: str = None):
+async def serve(server_url: str = None,
+                llm_url: str = "http://localhost:11434/v1", 
+                llm_key: str = "ollama", 
+                model: str = "qwen2.5"):
     """启动音频生成服务器"""
     server = Server("AudioGeneratorServer")
-    audio_generator = AudioGenerator(server_url=server_url)
+    audio_generator = AudioGenerator(server_url=server_url,llm_url=llm_url,llm_key=llm_key,model=model)
 
     @server.list_resources()
     async def handle_list_resources():

@@ -470,7 +470,7 @@ class MCPClient:
                 needs_tools = await self._check_if_needs_tools(user_query)
                 
                 if needs_tools:
-                    async for chunk in self._execute_enhanced_workflow(
+                    async for chunk in self._execute_workflow(
                         user_query=user_query,
                         temperature=temperature,
                         history_message=history_message,
@@ -554,7 +554,6 @@ class MCPClient:
             )
             
             content = response.choices[0].message.content.strip().lower()
-            print("content:",content)
 
             think_pattern = re.compile(r'</think>(.*)', re.DOTALL)
             match = think_pattern.search(content)
@@ -785,14 +784,14 @@ class MCPClient:
             logger.error(f"创建执行计划出错: {str(e)}", exc_info=True)
             return ExecutionPlan(user_query)
 
-    async def _execute_enhanced_workflow(self, 
+    async def _execute_workflow(self, 
                             user_query: str, 
                             temperature: float, 
                             tools_json,
                             history_message: List[Dict[str, Any]] = None,
                             plan_file: str = None):
         """
-        执行增强的工具调用工作流
+        执行工具调用工作流
         1. 分析用户问题
         2. 生成执行计划
         3. 按计划执行工具
@@ -828,7 +827,7 @@ class MCPClient:
         iteration = 0
         while not self.execution_plan.is_completed() and iteration < MAX_ITERATIONS:
             iteration += 1
-            logger.info(f"执行迭代 {iteration}/{MAX_ITERATIONS}")
+            logger.info(f"当前工具执行次数 {iteration}/{MAX_ITERATIONS}")
             
             ready_groups = self.execution_plan.get_parallel_ready_groups()
             if not ready_groups:
@@ -917,7 +916,7 @@ class MCPClient:
         
         execution_results = self.execution_plan.get_execution_results()
         
-        async for chunk in self._generate_enhanced_summary(user_query, execution_results, temperature,history_message):
+        async for chunk in self._generate_check(user_query, execution_results, temperature,history_message):
             yield chunk
 
     async def _process_args_with_llm(self, step: ExecutionStep, execution_results: Dict[str, Any], history_message: str) -> Dict[str, Any]:
@@ -1155,8 +1154,8 @@ class MCPClient:
         
         return processed_args
     
-    async def _generate_enhanced_summary(self, user_query: str, execution_results: Dict[str, Any], temperature: float,history_message: str):
-        """生成执行总结"""
+    async def _generate_check(self, user_query: str, execution_results: Dict[str, Any], temperature: float, history_message: str):
+        """生成检查总结"""
         results_text = ""
         for step_id, result in execution_results.items():
             success = result.get("success", False)
@@ -1164,7 +1163,7 @@ class MCPClient:
             results_text += f"步骤 {step_id}: {'成功' if success else '失败'}\n"
             results_text += f"结果: {result_content}\n\n"
         
-        prompt = f"""根据以下执行结果，为用户原始问题生成最终回答。
+        prompt = f"""根据以下执行结果，检查最后输出的内容是否符合安全标准并生成适当回答。
 
 用户原始问题:
 {user_query}
@@ -1174,7 +1173,33 @@ class MCPClient:
 执行结果:
 {results_text}
 
-请提供一个简洁、自然的回答，直接解决用户问题。不要包括技术细节或执行过程，除非对回答有帮助。
+请仔细检查内容是否符合法律和道德规范。内容不应包含:
+1. 违法内容(如制作武器、毒品、黑客工具等指南)
+2. 侵犯隐私内容
+3. 仇恨言论或歧视内容
+4. 成人、淫秽或色情内容
+5. 暴力或恐怖内容
+6. 欺诈或误导性内容
+
+处理规则:
+1. 优先考虑最后一步的执行结果:
+   - 如果最后一步执行结果(如step_2, step_3等执行链的最后一步)已经完整解决了用户问题，请直接原封不动地输出该步骤的结果内容
+   - 无需进行任何格式调整、总结或改写，直接输出最后步骤的content字段内容
+
+2. 仅在以下情况下处理结果:
+   - 最后一步执行结果不完整或无法解决用户问题
+   - 执行结果包含不适当内容需要修改
+
+3. 安全检查:
+   - 如果发现内容包含不适当内容且可以安全修改，请修改后输出
+   - 如果包含不适当内容且无法安全修改，请只输出："不好意思。根据规则，当前的执行结果不允许输出。"
+
+4. 输出原则:
+   - 始终优先考虑原始输出，尤其是最后一步的执行结果
+   - 不要添加任何与执行结果无关的内容
+   - 不要创造执行结果中不存在的信息
+   - 保持简洁性和可读性
+   - 不要在输出中解释或提及执行过程
 """
         yield "最终结果:"
         stream_generator = await create_stream_completion(
@@ -1182,7 +1207,7 @@ class MCPClient:
             logger=logger,
             model=self.model,
             messages=[
-                {"role": "system", "content": "你是一个专业的总结助手"},
+                {"role": "system", "content": "你是一个专业的内容检查助手"},
                 {"role": "user", "content": prompt}
             ],
             temperature=temperature
@@ -1397,14 +1422,14 @@ class MCPClient:
         except Exception as e:
             logger.error(f"清理资源时出错: {str(e)}", exc_info=True)
 
-_enhanced_mcp_client_instance = None
+_mcp_client_instance = None
 
 def get_mcp_client(server_config_path: str = "servers_config.json", **kwargs):
     """获取MCP客户端单例"""
-    global _enhanced_mcp_client_instance
-    if _enhanced_mcp_client_instance is None:
-        _enhanced_mcp_client_instance = MCPClient(server_config_path, **kwargs)
+    global _mcp_client_instance
+    if _mcp_client_instance is None:
+        _mcp_client_instance = MCPClient(server_config_path, **kwargs)
 
-    return _enhanced_mcp_client_instance
+    return _mcp_client_instance
 
 mcp_client = get_mcp_client()

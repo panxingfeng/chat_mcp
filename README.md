@@ -15,6 +15,12 @@ chat_mcp是一个聊天服务和工具执行平台，允许用户通过聊天界
 
 ## 快速开始
 
+### 下载项目
+
+```bash
+git clone https://github.com/panxingfeng/chat_mcp.git
+```
+
 ### 前端启动
 
 ```bash
